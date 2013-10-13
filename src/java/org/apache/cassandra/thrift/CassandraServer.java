@@ -32,8 +32,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import org.apache.cassandra.auth.AuthenticatedUser;
 import org.apache.cassandra.auth.Permission;
@@ -677,7 +675,7 @@ public class CassandraServer implements Cassandra.Iface
         zk.create("/Cazoo", rm, Ids.OPEN_ACL_UNSAFE,
                 CreateMode.PERSISTENT_SEQUENTIAL);
         zk.close();
-        logger.info("Cazoo adding to Dir: "+ rm.toString());
+        logger.debug("Cazoo adding to Dir: "+ rm.toString());
         
         doInsert(consistency_level, Arrays.asList(rm));
     }
