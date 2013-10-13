@@ -24,7 +24,6 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
-
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,8 +64,21 @@ public class CommitLog implements CommitLogMBean ,Watcher
 
     public CommitLogSegment activeSegment;
 
-    private final CommitLogMetrics metrics;
+    protected static final String CUR_VER = System.getProperty("cassandra.version", "2.0");
+    protected static final Map<String, Integer> VERSION_MAP = new HashMap<String, Integer> ()
+    {{
+        put("0.7", 1);
+        put("1.0", 3);
+        put("1.2", MessagingService.VERSION_12);
+        put("2.0", MessagingService.VERSION_20);
+    }};
 
+
+    protected final int getVersion()
+    {
+        return VERSION_MAP.get(CUR_VER);
+    }
+    
     private CommitLog()
     {
         DatabaseDescriptor.createAllDirectories();
@@ -204,7 +216,15 @@ public class CommitLog implements CommitLogMBean ,Watcher
     	logger.info("pgaref -adding rowmutation in the CommitLog"+rm);
     	try {
     		ZooKeeper zk = new ZooKeeper("127.0.0.1:2181", 10000, this);
-    		zk.create("/cazoo", "skata".getBytes(), Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT_SEQUENTIAL);
+    		
+    		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    		DataOutputStream out = new DataOutputStream(baos);
+    		RowMutation.serializer.serialize(rm, out, getVersion());
+    		out.close();
+    		
+    		log.info("pgaref- Write Serialized : "+ baos);
+
+    		zk.create("/cazoo", baos.toByteArray() , Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT_SEQUENTIAL);
     		zk.close();
     		} catch (KeeperException ke) {
         	  logger.info("CaZoo KeeperException "+ke);
@@ -394,6 +414,6 @@ public class CommitLog implements CommitLogMBean ,Watcher
      */
 	@Override
 	synchronized public void process(WatchedEvent event) {
-	      System.out.println("CaZoo: Got an event " + event.toString());
+	      System.out.println("CaZoo: Got a Write event " + event.toString());
 	  }
 }
