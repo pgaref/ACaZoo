@@ -202,16 +202,17 @@ public class CommitLog implements CommitLogMBean ,Watcher
     {
     	
     	logger.info("pgaref -adding rowmutation in the CommitLog"+rm);
-    	ZooKeeper zk = new ZooKeeper("127.0.0.1:2181", 10000, this);
-          try {
-            zk.create("cazoo", "skata".getBytes(), Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT_SEQUENTIAL);
-          } catch (KeeperException ke) {
+    	try {
+    		ZooKeeper zk = new ZooKeeper("127.0.0.1:2181", 10000, this);
+    		zk.create("cazoo", "skata".getBytes(), Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT_SEQUENTIAL);
+    		zk.close();
+    		} catch (KeeperException ke) {
         	  logger.info("CaZoo KeeperException "+ke);
-          }catch (InterruptedException ke1) {
+    		}catch (InterruptedException ke1) {
         	  logger.info("CaZoo InterruptedException "+ ke1);
-          }catch (IOException ke2) {
+          	}catch (IOException ke2) {
         	  logger.info("CaZoo IOException "+ke2);
-          }
+          	}
         executor.add(new LogRecordAdder(rm));
     }
 
