@@ -71,7 +71,6 @@ import org.apache.thrift.TException;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.ZooKeeper;
 import org.apache.zookeeper.ZooDefs.Ids;
-import org.apache.zookeeper.test.ClientBase;
 
 public class CassandraServer implements Cassandra.Iface
 {
@@ -673,17 +672,11 @@ public class CassandraServer implements Cassandra.Iface
          */
         
         ZooKeeper zk = new ZooKeeper("127.0.0.1:" + CLIENT_PORT,
-                ClientBase.CONNECTION_TIMEOUT, this);
+        		30000, this);
 
         zk.create("/Cazoo", rm, Ids.OPEN_ACL_UNSAFE,
                 CreateMode.PERSISTENT_SEQUENTIAL);
-        Assert.assertEquals(new String(zk.getData("/foo", null, null)), "foobar");
         zk.close();
-
-        main.shutdown();
-        Assert.assertTrue("waiting for server down",
-                ClientBase.waitForServerDown("127.0.0.1:" + CLIENT_PORT,
-                        ClientBase.CONNECTION_TIMEOUT));
         logger.info("Cazoo adding to Dir: "+ rm.toString());
         
         doInsert(consistency_level, Arrays.asList(rm));
