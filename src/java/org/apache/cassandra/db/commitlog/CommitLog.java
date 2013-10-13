@@ -36,12 +36,19 @@ import org.apache.cassandra.io.FSWriteError;
 import org.apache.cassandra.metrics.CommitLogMetrics;
 import org.apache.cassandra.net.MessagingService;
 import org.apache.cassandra.utils.FBUtilities;
+import org.apache.zookeeper.CreateMode;
+import org.apache.zookeeper.KeeperException;
+import org.apache.zookeeper.WatchedEvent;
+import org.apache.zookeeper.Watcher;
+import org.apache.zookeeper.ZooKeeper;
+import org.apache.zookeeper.ZooDefs.Ids;
+import org.apache.zookeeper.data.Stat;
 
 /*
  * Commit Log tracks every write operation into the system. The aim of the commit log is to be able to
  * successfully recover data that was not stored to disk via the Memtable.
  */
-public class CommitLog implements CommitLogMBean
+public class CommitLog implements CommitLogMBean ,Watcher
 {
     private static final Logger logger = LoggerFactory.getLogger(CommitLog.class);
 
@@ -186,10 +193,21 @@ public class CommitLog implements CommitLogMBean
      *
      * @param rm the RowMutation to add to the log
      */
+    /*
+     * pgaref - ZKServer must be called here!
+     */
+    
+    
     public void add(RowMutation rm)
     {
     	
-    	logger.info("pgaref -adding rowmutation in the CommitLog"+rm); 
+    	logger.info("pgaref -adding rowmutation in the CommitLog"+rm);
+    	ZooKeeper zk = new ZooKeeper("127.0.0.1:2181", 10000, this);
+          try {
+            zk.create("cazoo", "skata".getBytes(), Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT_SEQUENTIAL);
+          } catch (KeeperException ke) {
+        	  logger.info("CaZoo Creating node ");
+          }
         executor.add(new LogRecordAdder(rm));
     }
 
@@ -365,4 +383,13 @@ public class CommitLog implements CommitLogMBean
             return null;
         }
     }
+
+	@Override
+	synchronized public void process(WatchedEvent event) {
+	    try {
+	      System.out.println("CaZoo: Got an event " + event.toString());
+	    } catch (InterruptedException e) {
+	      e.printStackTrace();
+	    }
+	  }
 }
