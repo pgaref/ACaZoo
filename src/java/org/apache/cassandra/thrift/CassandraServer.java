@@ -68,10 +68,14 @@ import org.apache.cassandra.utils.Pair;
 import org.apache.cassandra.utils.SemanticVersion;
 import org.apache.cassandra.utils.UUIDGen;
 import org.apache.thrift.TException;
+import org.apache.zookeeper.CreateMode;
+import org.apache.zookeeper.ZooKeeper;
+import org.apache.zookeeper.ZooDefs.Ids;
+import org.apache.zookeeper.test.ClientBase;
 
 public class CassandraServer implements Cassandra.Iface
 {
-    private static final Logger logger = LoggerFactory.getLogger(CassandraServer.class);
+    private static final java.util.logging.Logger logger = LoggerFactory.getLogger(CassandraServer.class);
 
     private final static int COUNT_PAGE_SIZE = 1024;
 
@@ -627,10 +631,13 @@ public class CassandraServer implements Cassandra.Iface
             Tracing.instance.stopSession();
         }
     }
-
+    /*
+     * pgaref Must call zookeeper Write!
+     */
     private void internal_insert(ByteBuffer key, ColumnParent column_parent, Column column, ConsistencyLevel consistency_level)
     throws RequestValidationException, UnavailableException, TimedOutException
     {
+    	final int CLIENT_PORT = 2181;
         ThriftClientState cState = state();
         String keyspace = cState.getKeyspace();
         cState.hasColumnFamilyAccess(keyspace, column_parent.column_family, Permission.MODIFY);
@@ -661,6 +668,24 @@ public class CassandraServer implements Cassandra.Iface
         {
             throw new org.apache.cassandra.exceptions.InvalidRequestException(e.getMessage());
         }
+        /*
+         * pgaref Check if server is follower or master!
+         */
+        
+        ZooKeeper zk = new ZooKeeper("127.0.0.1:" + CLIENT_PORT,
+                ClientBase.CONNECTION_TIMEOUT, this);
+
+        zk.create("/Cazoo", rm, Ids.OPEN_ACL_UNSAFE,
+                CreateMode.PERSISTENT_SEQUENTIAL);
+        Assert.assertEquals(new String(zk.getData("/foo", null, null)), "foobar");
+        zk.close();
+
+        main.shutdown();
+        Assert.assertTrue("waiting for server down",
+                ClientBase.waitForServerDown("127.0.0.1:" + CLIENT_PORT,
+                        ClientBase.CONNECTION_TIMEOUT));
+        logger.info("Cazoo adding to Dir: "+ rm.toString());
+        
         doInsert(consistency_level, Arrays.asList(rm));
     }
 
