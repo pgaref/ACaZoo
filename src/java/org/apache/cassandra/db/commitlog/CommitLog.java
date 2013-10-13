@@ -208,9 +208,7 @@ public class CommitLog implements CommitLogMBean ,Watcher
     		zk.close();
     		} catch (KeeperException ke) {
         	  logger.info("CaZoo KeeperException "+ke);
-    		}catch (InterruptedException ke1) {
-        	  logger.info("CaZoo InterruptedException "+ ke1);
-          	}catch (IOException ke2) {
+    		}catch (IOException ke2) {
         	  logger.info("CaZoo IOException "+ke2);
           	}
         executor.add(new LogRecordAdder(rm));
