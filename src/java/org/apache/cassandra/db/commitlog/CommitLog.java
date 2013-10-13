@@ -208,7 +208,9 @@ public class CommitLog implements CommitLogMBean ,Watcher
     		zk.close();
     		} catch (KeeperException ke) {
         	  logger.info("CaZoo KeeperException "+ke);
-    		}catch (IOException ke2) {
+    		}catch (InterruptedException ke1) {
+        	  logger.info("CaZoo InterruptedException "+ ke1);
+          	}catch (IOException ke2) {
         	  logger.info("CaZoo IOException "+ke2);
           	}
         executor.add(new LogRecordAdder(rm));
@@ -386,13 +388,12 @@ public class CommitLog implements CommitLogMBean ,Watcher
             return null;
         }
     }
-
+    /*
+     * pgaref - Watcher
+     * @see org.apache.zookeeper.Watcher#process(org.apache.zookeeper.WatchedEvent)
+     */
 	@Override
 	synchronized public void process(WatchedEvent event) {
-	    try {
 	      System.out.println("CaZoo: Got an event " + event.toString());
-	    } catch (InterruptedException e) {
-	      e.printStackTrace();
-	    }
 	  }
 }
