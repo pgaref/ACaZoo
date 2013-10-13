@@ -663,7 +663,9 @@ public class CassandraServer implements Cassandra.Iface
         {
             throw new org.apache.cassandra.exceptions.InvalidRequestException(e.getMessage());
         }
+        logger.debug("Internal insert : " +  rm.toString());
         doInsert(consistency_level, Arrays.asList(rm));
+        
     }
 
     public void insert(ByteBuffer key, ColumnParent column_parent, Column column, ConsistencyLevel consistency_level)
