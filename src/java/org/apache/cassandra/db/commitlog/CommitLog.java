@@ -188,6 +188,8 @@ public class CommitLog implements CommitLogMBean
      */
     public void add(RowMutation rm)
     {
+    	
+    	logger.info("pgaref -adding rowmutation in the CommitLog"+rm); 
         executor.add(new LogRecordAdder(rm));
     }
 
