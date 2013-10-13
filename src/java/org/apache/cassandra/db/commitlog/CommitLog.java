@@ -206,7 +206,11 @@ public class CommitLog implements CommitLogMBean ,Watcher
           try {
             zk.create("cazoo", "skata".getBytes(), Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT_SEQUENTIAL);
           } catch (KeeperException ke) {
-        	  logger.info("CaZoo Creating node ");
+        	  logger.info("CaZoo KeeperException "+ke);
+          }catch (InterruptedException ke1) {
+        	  logger.info("CaZoo InterruptedException "+ ke1);
+          }catch (IOException ke2) {
+        	  logger.info("CaZoo IOException "+ke2);
           }
         executor.add(new LogRecordAdder(rm));
     }
