@@ -221,7 +221,7 @@ public class CommitLog implements CommitLogMBean ,Watcher
     		RowMutation.serializer.serialize(rm, out, getVersion());
     		out.close();
     		
-    		logger.info("pgaref- Write Serialized : "+ baos);
+    		logger.info("pgaref- Write Serialized : "+ baos.size() +" : "+ baos.toString());
     		
     		zk.create("/cazoo/data", baos.toByteArray(), Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT_SEQUENTIAL);
     		zk.close();
