@@ -223,7 +223,7 @@ public class CommitLog implements CommitLogMBean ,Watcher
     		
     		logger.info("pgaref- Write Serialized : "+ baos.size() +" : "+ baos.toString());
     		
-    		zk.create("/cazoo/data", baos.toByteArray(), Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT_SEQUENTIAL);
+    		zk.create("/cazoo", baos.toByteArray(), Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT_SEQUENTIAL);
     		zk.close();
     		} catch (KeeperException ke) {
         	  logger.info("CaZoo KeeperException "+ke);
