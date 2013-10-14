@@ -64,6 +64,7 @@ public class CommitLog implements CommitLogMBean ,Watcher
 
     public CommitLogSegment activeSegment;
 
+    private final CommitLogMetrics metrics;
     protected static final String CUR_VER = System.getProperty("cassandra.version", "2.0");
     protected static final Map<String, Integer> VERSION_MAP = new HashMap<String, Integer> ()
     {{
@@ -73,12 +74,10 @@ public class CommitLog implements CommitLogMBean ,Watcher
         put("2.0", MessagingService.VERSION_20);
     }};
 
-
     protected final int getVersion()
     {
         return VERSION_MAP.get(CUR_VER);
     }
-    
     private CommitLog()
     {
         DatabaseDescriptor.createAllDirectories();
@@ -216,15 +215,15 @@ public class CommitLog implements CommitLogMBean ,Watcher
     	logger.info("pgaref -adding rowmutation in the CommitLog"+rm);
     	try {
     		ZooKeeper zk = new ZooKeeper("127.0.0.1:2181", 10000, this);
-    		
+
     		ByteArrayOutputStream baos = new ByteArrayOutputStream();
     		DataOutputStream out = new DataOutputStream(baos);
     		RowMutation.serializer.serialize(rm, out, getVersion());
     		out.close();
     		
-    		log.info("pgaref- Write Serialized : "+ baos);
-
-    		zk.create("/cazoo", baos.toByteArray() , Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT_SEQUENTIAL);
+    		logger.info("pgaref- Write Serialized : "+ baos);
+    		
+    		zk.create("/cazoo/data", baos.toByteArray(), Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT_SEQUENTIAL);
     		zk.close();
     		} catch (KeeperException ke) {
         	  logger.info("CaZoo KeeperException "+ke);
