@@ -507,8 +507,8 @@ public class PrepRequestProcessor extends Thread implements RequestProcessor {
      */
     @SuppressWarnings("unchecked")
     protected void pRequest(Request request) throws RequestProcessorException {
-        // LOG.info("Prep>>> cxid = " + request.cxid + " type = " +
-        // request.type + " id = 0x" + Long.toHexString(request.sessionId));
+         LOG.info("Prep>>> xid = " + request.cxid + " type = " +
+         request.type + " id = 0x" + Long.toHexString(request.sessionId) + " zxid "+ request.zxid +" SIZE: "+ request.request.capacity() );
         request.hdr = null;
         request.txn = null;
         

@@ -116,6 +116,17 @@ public class FollowerZooKeeperServer extends LearnerZooKeeperServer {
             System.exit(12);
         }
         Request request = pendingTxns.remove();
+        /*
+         * pgaref - Check if i get the requests right!
+         */
+        String value = System.getenv("CAZOO_ROLE");
+        if (value == null) {
+        	LOG.info("pgaref Enviromental variable CAZOO_ROLE NOT SET!!!!");
+        } else if (value.compareToIgnoreCase("FOLLOWER") == 0) {
+        	if(request.cxid == 1 )
+        		LOG.info("pgaref Follower Got>>> xid = " + request.cxid + " type = " +
+        		         request.type + " id = 0x" + Long.toHexString(request.sessionId) + " zxid "+ request.zxid +"SIZE: "+ request.request.capacity() );
+        }
         commitProcessor.commit(request);
     }
     

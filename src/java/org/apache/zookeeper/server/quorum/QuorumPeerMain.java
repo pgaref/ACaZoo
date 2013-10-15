@@ -28,6 +28,7 @@ import org.apache.zookeeper.jmx.ManagedUtil;
 import org.apache.zookeeper.server.ServerCnxnFactory;
 import org.apache.zookeeper.server.ZKDatabase;
 import org.apache.zookeeper.server.DatadirCleanupManager;
+import org.apache.zookeeper.server.ZooKeeperServer;
 import org.apache.zookeeper.server.ZooKeeperServerMain;
 import org.apache.zookeeper.server.persistence.FileTxnSnapLog;
 import org.apache.zookeeper.server.quorum.QuorumPeerConfig.ConfigException;
@@ -154,4 +155,12 @@ public class QuorumPeerMain {
           LOG.warn("Quorum Peer interrupted", e);
       }
     }
+    /*
+     * pgaref Accessor for Zookeeper Instance
+     * Lets make it Tread Safe
+     */
+    public static ZooKeeperServer getZookeeperServerInstance(){
+    		return ZooKeeperServerMain.getZookeeperInstance();
+    }
+    
 }

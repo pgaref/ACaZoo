@@ -109,7 +109,7 @@ public class ZooKeeperServer implements SessionExpirer, ServerStats.Provider {
     private ZKDatabase zkDb;
     protected long hzxid = 0;
     public final static Exception ok = new Exception("No prob");
-    protected RequestProcessor firstProcessor;
+    protected static RequestProcessor firstProcessor;
     protected volatile boolean running;
 
     /**
@@ -849,6 +849,12 @@ public class ZooKeeperServer implements SessionExpirer, ServerStats.Provider {
         return false; 
     }
 
+    /*
+     * pgaref Getter
+     */
+    public static synchronized RequestProcessor getRequestProcessor(){
+    	return firstProcessor;
+    }
     public void processPacket(ServerCnxn cnxn, ByteBuffer incomingBuffer) throws IOException {
         // We have the request, now process and setup for next
         InputStream bais = new ByteBufferInputStream(incomingBuffer);
@@ -978,6 +984,6 @@ public class ZooKeeperServer implements SessionExpirer, ServerStats.Provider {
         }
         return rc;
     }
-
+    
 
 }

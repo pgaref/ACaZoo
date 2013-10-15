@@ -199,7 +199,7 @@ saved_caches_directory: /var/lib/cassandra/saved_caches
 # you should reduce that; 16*cores works reasonably well for 1MB blobs.
 # It should be at least as large as the concurrent_writes setting.
 commitlog_sync: periodic
-commitlog_sync_period_in_ms: 10000
+commitlog_sync_period_in_ms: 60000
 # commitlog_periodic_queue_size:
 
 # The size of the individual commitlog file segments.  A commitlog
@@ -255,7 +255,7 @@ concurrent_writes: 32
 # segment multiple), Cassandra will flush every dirty CF in the oldest
 # segment and remove it.  So a small total commitlog space will tend
 # to cause more flush activity on less-active columnfamilies.
-# commitlog_total_space_in_mb: 4096
+commitlog_total_space_in_mb: 4096
 
 # This sets the amount of memtable flush writer threads.  These will
 # be blocked by disk io, and each one will hold a memtable in memory

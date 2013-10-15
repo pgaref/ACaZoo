@@ -19,15 +19,17 @@ package org.apache.cassandra.db.commitlog;
 
 import java.io.*;
 import java.lang.management.ManagementFactory;
+import java.nio.ByteBuffer;
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
+
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.apache.cassandra.config.Config;
 import org.apache.cassandra.config.DatabaseDescriptor;
 import org.apache.cassandra.db.*;
@@ -41,7 +43,11 @@ import org.apache.zookeeper.WatchedEvent;
 import org.apache.zookeeper.Watcher;
 import org.apache.zookeeper.ZooKeeper;
 import org.apache.zookeeper.ZooDefs.Ids;
+import org.apache.zookeeper.ZooDefs.OpCode;
 import org.apache.zookeeper.data.Stat;
+import org.apache.zookeeper.server.Request;
+import org.apache.zookeeper.server.RequestProcessor.RequestProcessorException;
+import org.apache.zookeeper.server.ZooKeeperServer;
 
 /*
  * Commit Log tracks every write operation into the system. The aim of the commit log is to be able to
@@ -212,26 +218,51 @@ public class CommitLog implements CommitLogMBean ,Watcher
     public void add(RowMutation rm)
     {
     	
-    	logger.info("pgaref -adding rowmutation in the CommitLog"+rm);
-    	try {
-    		ZooKeeper zk = new ZooKeeper("127.0.0.1:2181", 10000, this);
-
-    		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-    		DataOutputStream out = new DataOutputStream(baos);
-    		RowMutation.serializer.serialize(rm, out, getVersion());
-    		out.close();
-    		
-    		logger.info("pgaref- Write Serialized : "+ baos.size() +" : "+ baos.toString());
-    		
-    		zk.create("/cazoo", baos.toByteArray(), Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT_SEQUENTIAL);
-    		zk.close();
-    		} catch (KeeperException ke) {
-        	  logger.info("CaZoo KeeperException "+ke);
-    		}catch (InterruptedException ke1) {
-        	  logger.info("CaZoo InterruptedException "+ ke1);
-          	}catch (IOException ke2) {
-        	  logger.info("CaZoo IOException "+ke2);
-          	}
+    	String value = System.getenv("CAZOO_ROLE");
+        if (value == null) {
+        	logger.info("Enviromental variable CAZOO_ROLE NOT SET!!!!");
+        } else if (value.compareToIgnoreCase("MASTER") == 0) {
+        	logger.info("pgaref - Master: adding rowmutation in the CommitLog");
+        	ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        	try {
+        		DataOutputStream out = new DataOutputStream(baos);
+				RowMutation.serializer.serialize(rm, out, getVersion());
+				out.close();
+			} catch (IOException e) {
+				logger.info("pgaref - Master: Serializer exception!");
+				e.printStackTrace();
+			}
+    		if(baos.size() >0){
+    			// Debug 1, 3, 8 => 1l
+    			Request foo = new Request(null, 1l, 1, OpCode.create, ByteBuffer.wrap(baos.toByteArray()), null);
+	        	try {
+					ZooKeeperServer.getRequestProcessor().processRequest(foo);
+				} catch (RequestProcessorException e) {
+					logger.info("pgaref - Master: (send) Process Request exception!");
+				}
+    		}
+        	/*
+        	 * Client mode
+        	try {
+	    		ZooKeeper zk = new ZooKeeper("127.0.0.1:2181", 10000, this);
+	
+	    		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+	    		DataOutputStream out = new DataOutputStream(baos);
+	    		RowMutation.serializer.serialize(rm, out, getVersion());
+	    		out.close();
+	    		
+	    		logger.info("pgaref- Write Serialized : "+ baos.size() +" : "+ baos.toString());
+	    		
+	    		zk.create("/cazoo", baos.toByteArray(), Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT_SEQUENTIAL);
+	    		zk.close();
+	    		} catch (KeeperException ke) {
+	        	  logger.info("CaZoo KeeperException "+ke);
+	    		}catch (InterruptedException ke1) {
+	        	  logger.info("CaZoo InterruptedException "+ ke1);
+	          	}catch (IOException ke2) {
+	        	  logger.info("CaZoo IOException "+ke2);
+	          	}*/
+        }
         executor.add(new LogRecordAdder(rm));
     }
 
