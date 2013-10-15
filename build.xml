@@ -168,6 +168,7 @@
         <delete dir="${cobertura.classes.dir}" />
         <delete dir="${build.src.gen-java}" />
         <delete dir="${version.properties.dir}" />
+	<delete dir="${build.dir}" />
     </target>
     <target depends="clean" name="cleanall"/>
 
