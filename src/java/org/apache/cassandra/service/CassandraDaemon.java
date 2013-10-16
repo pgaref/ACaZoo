@@ -80,7 +80,7 @@ public class CassandraDaemon
         public void run()
         {
         	logger.info("CaZoo: Initiating new Zookeeper thread!");
-        	String [] ar = {"/home/pgaref/workspace/cassandra-trunk/conf/zooConf/zoo.cfg"};
+        	String [] ar = {"./conf/zooConf/zoo.cfg"};
         	ConfDir = ar;
             zooQuorum = new QuorumPeerMain(ar);
             while(true){
