@@ -61,7 +61,9 @@ import org.apache.zookeeper.server.quorum.QuorumPeerMain;
 public class CassandraDaemon
 {
     public static final String MBEAN_NAME = "org.apache.cassandra.db:type=NativeAccess";
+    private static final Logger logger = LoggerFactory.getLogger(CassandraDaemon.class);
     public static QuorumPeerMain zooQuorum;
+    private static String [] ConfDir;
     // Have a dedicated thread to call exit to avoid deadlock in the case where the thread that wants to invoke exit
     // belongs to an executor that our shutdown hook wants to wait to exit gracefully. See CASSANDRA-5273.
     private static final Thread exitThread = new Thread(new Runnable()
@@ -79,12 +81,19 @@ public class CassandraDaemon
         {
         	logger.info("CaZoo: Initiating new Zookeeper thread!");
         	String [] ar = {"/home/pgaref/workspace/cassandra-trunk/conf/zooConf/zoo.cfg"};
+        	ConfDir = ar;
             zooQuorum = new QuorumPeerMain(ar);
+            while(true){
+            	if(!QuorumPeerMain.getZookeeperServerInstance().isRunning()){
+            		zooQuorum = new QuorumPeerMain(ConfDir);
+            		logger.info("pgaref - Cazoo Server RESTARTING!");
+            	}
+            }
+            
         }
     }, "Exit invoker");
     
-    private static final Logger logger = LoggerFactory.getLogger(CassandraDaemon.class);
-
+    
     private static final CassandraDaemon instance = new CassandraDaemon();
 
     public Server thriftServer;

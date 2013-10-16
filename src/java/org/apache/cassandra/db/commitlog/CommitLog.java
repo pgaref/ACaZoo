@@ -48,6 +48,7 @@ import org.apache.zookeeper.data.Stat;
 import org.apache.zookeeper.server.Request;
 import org.apache.zookeeper.server.RequestProcessor.RequestProcessorException;
 import org.apache.zookeeper.server.ZooKeeperServer;
+import org.apache.zookeeper.server.quorum.QuorumPeerMain;
 
 /*
  * Commit Log tracks every write operation into the system. The aim of the commit log is to be able to
@@ -218,10 +219,11 @@ public class CommitLog implements CommitLogMBean ,Watcher
     public void add(RowMutation rm)
     {
     	
-    	String value = System.getenv("CAZOO_ROLE");
+    	/*String value = System.getenv("CAZOO_ROLE");
         if (value == null) {
         	logger.info("Enviromental variable CAZOO_ROLE NOT SET!!!!");
-        } else if (value.compareToIgnoreCase("MASTER") == 0) {
+        } else if (value.compareToIgnoreCase("MASTER") == 0) {*/
+    	if(QuorumPeerMain.getQuorumPeer().getServerState().equalsIgnoreCase("LEADING")){
         	logger.info("pgaref - Master: adding rowmutation in the CommitLog");
         	ByteArrayOutputStream baos = new ByteArrayOutputStream();
         	try {

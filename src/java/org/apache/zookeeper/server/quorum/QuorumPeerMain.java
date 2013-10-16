@@ -61,12 +61,12 @@ import org.apache.zookeeper.server.quorum.QuorumPeerConfig.ConfigException;
  * "myid" that contains the server id as an ASCII decimal value.
  *
  */
-public class QuorumPeerMain {
+public class QuorumPeerMain{
     private static final Logger LOG = LoggerFactory.getLogger(QuorumPeerMain.class);
 
     private static final String USAGE = "Usage: QuorumPeerMain configfile";
 
-    protected QuorumPeer quorumPeer;
+    public static QuorumPeer quorumPeer;
 
     /**
      * To start the replicated server specify the configuration file name on
@@ -74,7 +74,9 @@ public class QuorumPeerMain {
      * @param args path to the configfile
      */
     public QuorumPeerMain(String[] args) {
-        try {
+        
+    	
+    	try {
             this.initializeAndRun(args);
         } catch (IllegalArgumentException e) {
             LOG.error("Invalid arguments, exiting abnormally", e);
@@ -161,6 +163,9 @@ public class QuorumPeerMain {
      */
     public static ZooKeeperServer getZookeeperServerInstance(){
     		return ZooKeeperServerMain.getZookeeperInstance();
+    }
+    public static QuorumPeer getQuorumPeer(){
+    	return quorumPeer;
     }
     
 }
