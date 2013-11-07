@@ -21,6 +21,7 @@ package org.apache.zookeeper.server;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.ByteBuffer;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -39,15 +40,19 @@ import org.slf4j.LoggerFactory;
 import org.apache.zookeeper.KeeperException;
 import org.apache.zookeeper.KeeperException.NoNodeException;
 import org.apache.zookeeper.Watcher;
+import org.apache.zookeeper.ZooDefs.OpCode;
 import org.apache.zookeeper.data.ACL;
 import org.apache.zookeeper.data.Stat;
+import org.apache.zookeeper.proto.CreateRequest;
 import org.apache.zookeeper.server.DataTree.ProcessTxnResult;
 import org.apache.zookeeper.server.persistence.FileTxnSnapLog;
 import org.apache.zookeeper.server.persistence.FileTxnSnapLog.PlayBackListener;
 import org.apache.zookeeper.server.quorum.Leader;
+import org.apache.zookeeper.server.quorum.QuorumPeerMain;
 import org.apache.zookeeper.server.quorum.Leader.Proposal;
 import org.apache.zookeeper.server.quorum.QuorumPacket;
 import org.apache.zookeeper.server.util.SerializeUtils;
+import org.apache.zookeeper.txn.CreateTxn;
 import org.apache.zookeeper.txn.TxnHeader;
 
 /**
@@ -232,6 +237,9 @@ public class ZKDatabase {
      * @param request committed request
      */
     public void addCommittedProposal(Request request) {
+    	
+    	
+        	
         WriteLock wl = logLock.writeLock();
         try {
             wl.lock();
@@ -257,6 +265,27 @@ public class ZKDatabase {
             }
             QuorumPacket pp = new QuorumPacket(Leader.PROPOSAL, request.zxid,
                     baos.toByteArray(), null);
+            
+            /*
+             * pgaref - Follower packet? I should use this Method to get commited transactions!
+             */
+            if((request.sessionId == 2285l) && QuorumPeerMain.quorumPeer.getServerState().equalsIgnoreCase("FOLLOWING")){
+            	//Is my create request here?
+            	LOG.info("PGAREF ZKDATABASE Follower : "+
+            	QuorumPeerMain.quorumPeer.getServerState().equalsIgnoreCase("FOLLOWING") + " request bb? : "+ new String(pp.getData()) +
+            	" Create OpCode? : " +  (request.type  == OpCode.create));
+            	TxnHeader hdr = new TxnHeader();
+            	Record txn = null;
+                try {
+					txn = SerializeUtils.deserializeTxn(pp.getData(), hdr);
+				} catch (IOException e) {
+					LOG.info("De - Serialization Error");
+				}
+                LOG.info("pgaref FINALLY GOT -> "+ new String(((CreateTxn)txn).getData()));
+            	
+            }
+            //End here!
+            
             Proposal p = new Proposal();
             p.packet = pp;
             p.request = request;

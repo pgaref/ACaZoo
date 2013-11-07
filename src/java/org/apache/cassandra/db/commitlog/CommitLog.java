@@ -49,6 +49,7 @@ import org.apache.zookeeper.server.Request;
 import org.apache.zookeeper.server.RequestProcessor.RequestProcessorException;
 import org.apache.zookeeper.server.ZooKeeperServer;
 import org.apache.zookeeper.server.quorum.QuorumPeerMain;
+import org.apache.zookeeper.server.quorum.ZooStandalone;
 
 /*
  * Commit Log tracks every write operation into the system. The aim of the commit log is to be able to
@@ -212,17 +213,31 @@ public class CommitLog implements CommitLogMBean ,Watcher
      * @param rm the RowMutation to add to the log
      */
     /*
-     * pgaref - ZKServer must be called here!
+     * pgaref - ZKServer add commitLog Entry!
      */
     
-    
+    static int  i =0;
     public void add(RowMutation rm)
     {
     	
-    	/*String value = System.getenv("CAZOO_ROLE");
-        if (value == null) {
-        	logger.info("Enviromental variable CAZOO_ROLE NOT SET!!!!");
-        } else if (value.compareToIgnoreCase("MASTER") == 0) {*/
+    	logger.info("pgaref - Commitlog called!!!");
+    	if( i > 10 ){
+    		
+    		logger.info("pgaref - Master: adding rowmutation in the CommitLog");
+    		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        	try {
+        		DataOutputStream out = new DataOutputStream(baos);
+				RowMutation.serializer.serialize(rm, out, getVersion());
+				out.close();
+			} catch (IOException e) {
+				logger.info("pgaref - Master: Serializer exception!");
+				e.printStackTrace();
+			}
+    		org.apache.cassandra.service.CassandraDaemon.ZooServer.insertPersistent("/cassandra", baos.toByteArray());
+    		
+    	}
+    	i++;
+    	/*
     	if(QuorumPeerMain.getQuorumPeer().getServerState().equalsIgnoreCase("LEADING")){
         	logger.info("pgaref - Master: adding rowmutation in the CommitLog");
         	ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -242,7 +257,7 @@ public class CommitLog implements CommitLogMBean ,Watcher
 				} catch (RequestProcessorException e) {
 					logger.info("pgaref - Master: (send) Process Request exception!");
 				}
-    		}
+    		}*/
         	/*
         	 * Client mode
         	try {
@@ -263,8 +278,8 @@ public class CommitLog implements CommitLogMBean ,Watcher
 	        	  logger.info("CaZoo InterruptedException "+ ke1);
 	          	}catch (IOException ke2) {
 	        	  logger.info("CaZoo IOException "+ke2);
-	          	}*/
-        }
+	          	}
+        }*/
         executor.add(new LogRecordAdder(rm));
     }
 

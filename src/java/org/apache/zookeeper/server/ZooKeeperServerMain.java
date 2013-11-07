@@ -40,7 +40,7 @@ public class ZooKeeperServerMain {
         "Usage: ZooKeeperServerMain configfile | port datadir [ticktime] [maxcnxns]";
 
     private ServerCnxnFactory cnxnFactory;
-    private static ZooKeeperServer zkServer;
+
     /*
      * Start up the ZooKeeper server.
      *
@@ -98,7 +98,7 @@ public class ZooKeeperServerMain {
             // so rather than spawning another thread, we will just call
             // run() in this thread.
             // create a file logger url from the command line args
-            zkServer = new ZooKeeperServer();
+            ZooKeeperServer zkServer = new ZooKeeperServer();
 
             FileTxnSnapLog ftxn = new FileTxnSnapLog(new
                    File(config.dataLogDir), new File(config.dataDir));
@@ -125,12 +125,5 @@ public class ZooKeeperServerMain {
      */
     protected void shutdown() {
         cnxnFactory.shutdown();
-    }
-    /*
-     * pgaref Accessor for Zookeeper Instance
-     * Lets make it Tread Safe
-     */
-    public static synchronized ZooKeeperServer getZookeeperInstance(){
-    		return zkServer;
     }
 }

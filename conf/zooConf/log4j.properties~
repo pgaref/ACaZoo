@@ -1,5 +1,5 @@
 # Define some default values that can be overridden by system properties
-zookeeper.root.logger=DEBUG, CONSOLE
+zookeeper.root.logger=INFO, CONSOLE
 zookeeper.console.threshold=DEBUG
 zookeeper.log.dir=.
 zookeeper.log.file=zookeeper.log

@@ -24,10 +24,12 @@ import java.nio.ByteBuffer;
 
 import org.apache.jute.BinaryInputArchive;
 import org.apache.jute.Record;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ByteBufferInputStream extends InputStream {
     ByteBuffer bb;
-
+    private static final Logger LOG = LoggerFactory.getLogger(ByteBufferInputStream.class);
     public ByteBufferInputStream(ByteBuffer bb) {
         this.bb = bb;
     }
@@ -77,6 +79,8 @@ public class ByteBufferInputStream extends InputStream {
         BinaryInputArchive ia;
         ia = BinaryInputArchive.getArchive(new ByteBufferInputStream(bb));
         record.deserialize(ia, "request");
+        LOG.info("pgaref - De serialize : "+ record.toString());
+        
     }
 
 }

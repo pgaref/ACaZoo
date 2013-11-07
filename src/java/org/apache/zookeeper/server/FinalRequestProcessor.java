@@ -52,10 +52,10 @@ import org.apache.zookeeper.proto.SyncRequest;
 import org.apache.zookeeper.proto.SyncResponse;
 import org.apache.zookeeper.server.DataTree.ProcessTxnResult;
 import org.apache.zookeeper.server.ZooKeeperServer.ChangeRecord;
+import org.apache.zookeeper.server.quorum.QuorumPeerMain;
 import org.apache.zookeeper.txn.CreateSessionTxn;
 import org.apache.zookeeper.txn.ErrorTxn;
 import org.apache.zookeeper.txn.TxnHeader;
-
 import org.apache.zookeeper.MultiTransactionRecord;
 import org.apache.zookeeper.Op;
 import org.apache.zookeeper.OpResult;
@@ -87,6 +87,9 @@ public class FinalRequestProcessor implements RequestProcessor {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Processing request:: " + request);
         }
+        /*pgaref
+         *LOG.info("Processing request:: " +request.hdr.toString() + " ~  "+request.txn.toString()  );
+         */
         // request.addRQRec(">final");
         long traceMask = ZooTrace.CLIENT_REQUEST_TRACE_MASK;
         if (request.type == OpCode.ping) {
@@ -397,16 +400,21 @@ public class FinalRequestProcessor implements RequestProcessor {
             new ReplyHeader(request.cxid, lastZxid, err.intValue());
 
         zks.serverStats().updateLatency(request.createTime);
-        cnxn.updateStatsForResponse(request.cxid, lastZxid, lastOp,
-                    request.createTime, System.currentTimeMillis());
-
-        try {
-            cnxn.sendResponse(hdr, rsp, "response");
-            if (closeSession) {
-                cnxn.sendCloseSession();
-            }
-        } catch (IOException e) {
-            LOG.error("FIXMSG",e);
+        /*
+         * pgaref - avoid Responses to non - existing session!
+         */
+        if(request.sessionId != 2285l) {
+	        cnxn.updateStatsForResponse(request.cxid, lastZxid, lastOp,
+	                    request.createTime, System.currentTimeMillis());
+	
+	        try {
+	            cnxn.sendResponse(hdr, rsp, "response");
+	            if (closeSession) {
+	                cnxn.sendCloseSession();
+	            }
+	        } catch (IOException e) {
+	            LOG.error("FIXMSG",e);
+	        }
         }
     }
 

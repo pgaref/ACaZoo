@@ -91,6 +91,8 @@ public class CommitProcessor extends Thread implements RequestProcessor {
                          * use nextPending because it has the cnxn member set
                          * properly.
                          */
+                        
+                        
                         if (nextPending != null
                                 && nextPending.sessionId == r.sessionId
                                 && nextPending.cxid == r.cxid) {
@@ -99,8 +101,9 @@ public class CommitProcessor extends Thread implements RequestProcessor {
                             nextPending.hdr = r.hdr;
                             nextPending.txn = r.txn;
                             nextPending.zxid = r.zxid;
-                            toProcess.add(nextPending);
+                            toProcess.add(nextPending); 
                             nextPending = null;
+                            
                         } else {
                             // this request came from someone else so just
                             // send the commit packet
@@ -149,7 +152,9 @@ public class CommitProcessor extends Thread implements RequestProcessor {
         }
         LOG.info("CommitProcessor exited loop!");
     }
-
+    /*
+     * pgaref Touched this!
+     */
     synchronized public void commit(Request request) {
         if (!finished) {
             if (request == null) {
@@ -159,7 +164,7 @@ public class CommitProcessor extends Thread implements RequestProcessor {
             }
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Committing request:: " + request);
-            }
+            }	
             committedRequests.add(request);
             notifyAll();
         }

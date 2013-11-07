@@ -106,12 +106,22 @@ public class ZooKeeperServer implements SessionExpirer, ServerStats.Provider {
     protected int maxSessionTimeout = -1;
     protected SessionTracker sessionTracker;
     private FileTxnSnapLog txnLogFactory = null;
-    private ZKDatabase zkDb;
+    public static ZKDatabase zkDb;
     protected long hzxid = 0;
     public final static Exception ok = new Exception("No prob");
-    protected static RequestProcessor firstProcessor;
+    /*
+     * pgaref
+     */
+    public static RequestProcessor firstProcessor;
+    public static RequestProcessor finalProcessor;
     protected volatile boolean running;
 
+    
+    /*
+     * pgaref
+     */
+    
+    
     /**
      * This is the secret that we use to generate passwords, for the moment it
      * is more of a sanity check.
@@ -232,7 +242,7 @@ public class ZooKeeperServer implements SessionExpirer, ServerStats.Provider {
      * @return the zookeeper database for this server
      */
     public ZKDatabase getZKDatabase() {
-        return this.zkDb;
+        return zkDb;
     }
     
     /**
@@ -240,7 +250,7 @@ public class ZooKeeperServer implements SessionExpirer, ServerStats.Provider {
      * @param zkDb
      */
     public void setZKDatabase(ZKDatabase zkDb) {
-       this.zkDb = zkDb;
+       ZooKeeperServer.zkDb = zkDb;
     }
     
     /**
@@ -394,7 +404,7 @@ public class ZooKeeperServer implements SessionExpirer, ServerStats.Provider {
     }
 
     protected void setupRequestProcessors() {
-        RequestProcessor finalProcessor = new FinalRequestProcessor(this);
+        finalProcessor = new FinalRequestProcessor(this);
         RequestProcessor syncProcessor = new SyncRequestProcessor(this,
                 finalProcessor);
         ((SyncRequestProcessor)syncProcessor).start();
@@ -849,12 +859,6 @@ public class ZooKeeperServer implements SessionExpirer, ServerStats.Provider {
         return false; 
     }
 
-    /*
-     * pgaref Getter
-     */
-    public static synchronized RequestProcessor getRequestProcessor(){
-    	return firstProcessor;
-    }
     public void processPacket(ServerCnxn cnxn, ByteBuffer incomingBuffer) throws IOException {
         // We have the request, now process and setup for next
         InputStream bais = new ByteBufferInputStream(incomingBuffer);
@@ -984,6 +988,8 @@ public class ZooKeeperServer implements SessionExpirer, ServerStats.Provider {
         }
         return rc;
     }
-    
 
+    public static synchronized RequestProcessor getRequestProcessor(){
+    	return firstProcessor;
+    }
 }

@@ -25,6 +25,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 import org.apache.jute.Record;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.apache.zookeeper.proto.CreateRequest;
+import org.apache.zookeeper.server.ByteBufferInputStream;
 import org.apache.zookeeper.server.FinalRequestProcessor;
 import org.apache.zookeeper.server.Request;
 import org.apache.zookeeper.server.RequestProcessor;
@@ -116,18 +118,14 @@ public class FollowerZooKeeperServer extends LearnerZooKeeperServer {
             System.exit(12);
         }
         Request request = pendingTxns.remove();
+        
         /*
-         * pgaref - Check if i get the requests right!
-         
-        String value = System.getenv("CAZOO_ROLE");
-        if (value == null) {
-        	LOG.info("pgaref Enviromental variable CAZOO_ROLE NOT SET!!!!");
-        } else if (value.compareToIgnoreCase("FOLLOWER") == 0) {*/
-        if(!QuorumPeerMain.getQuorumPeer().getServerState().equalsIgnoreCase("LEADING")){
-        	if(request.cxid == 1 )
-        		LOG.info("pgaref Follower Got>>> xid = " + request.cxid + " type = " +
-        		         request.type + " id = 0x" + Long.toHexString(request.sessionId) + " zxid "+ request.zxid +"SIZE: "+ request.request.capacity() );
+         * pgaref
+         */
+        if(request.sessionId == 2285l){
+        	LOG.info("pgaref FOLLOWER - !!!!! request: Session: "+ request.sessionId + " toString: " + request.toString());
         }
+        //ENDS HERE
         commitProcessor.commit(request);
     }
     

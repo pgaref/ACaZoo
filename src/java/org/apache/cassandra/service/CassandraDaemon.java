@@ -22,6 +22,8 @@ import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.net.InetAddress;
 import java.util.Arrays;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -50,7 +52,10 @@ import org.apache.cassandra.tracing.Tracing;
 import org.apache.cassandra.utils.CLibrary;
 import org.apache.cassandra.utils.Mx4jTool;
 import org.apache.cassandra.utils.Pair;
+import org.apache.zookeeper.server.ZooKeeperServer;
 import org.apache.zookeeper.server.quorum.QuorumPeerMain;
+import org.apache.zookeeper.server.quorum.ZooEmbedded;
+import org.apache.zookeeper.server.quorum.ZooStandalone;
 
 /**
  * The <code>CassandraDaemon</code> is an abstraction for a Cassandra daemon
@@ -62,7 +67,7 @@ public class CassandraDaemon
 {
     public static final String MBEAN_NAME = "org.apache.cassandra.db:type=NativeAccess";
     private static final Logger logger = LoggerFactory.getLogger(CassandraDaemon.class);
-    public static QuorumPeerMain zooQuorum;
+    public static ZooStandalone ZooServer;
     private static String [] ConfDir;
     // Have a dedicated thread to call exit to avoid deadlock in the case where the thread that wants to invoke exit
     // belongs to an executor that our shutdown hook wants to wait to exit gracefully. See CASSANDRA-5273.
@@ -79,20 +84,13 @@ public class CassandraDaemon
     {
         public void run()
         {
-        	logger.info("CaZoo: Initiating new Zookeeper thread!");
-        	String [] ar = {"./conf/zooConf/zoo.cfg"};
-        	ConfDir = ar;
-            zooQuorum = new QuorumPeerMain(ar);
-            while(true){
-            	if(!QuorumPeerMain.getZookeeperServerInstance().isRunning()){
-            		zooQuorum = new QuorumPeerMain(ConfDir);
-            		logger.info("pgaref - Cazoo Server RESTARTING!");
-            	}
-            }
+        	logger.info("CALL ME");
+        	ZooServer = new ZooStandalone();
+        	ZooServer.init();
+            
             
         }
     }, "Exit invoker");
-    
     
     private static final CassandraDaemon instance = new CassandraDaemon();
 

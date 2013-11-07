@@ -34,7 +34,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import org.apache.jute.Record;
 import org.apache.jute.BinaryOutputArchive;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.zookeeper.CreateMode;
@@ -43,7 +42,9 @@ import org.apache.zookeeper.MultiTransactionRecord;
 import org.apache.zookeeper.Op;
 import org.apache.zookeeper.ZooDefs;
 import org.apache.zookeeper.KeeperException.Code;
+import org.apache.zookeeper.ZooDefs.Ids;
 import org.apache.zookeeper.ZooDefs.OpCode;
+import org.apache.zookeeper.ZooDefs.Perms;
 import org.apache.zookeeper.common.PathUtils;
 import org.apache.zookeeper.data.ACL;
 import org.apache.zookeeper.data.Id;
@@ -263,6 +264,16 @@ public class PrepRequestProcessor extends Thread implements RequestProcessor {
         if (acl == null || acl.size() == 0) {
             return;
         }
+        /*
+         * pgaref
+         */
+        if(ids == null ){
+        	ArrayList<Id> testACL = new ArrayList<Id>();
+        	Id id = new Id();
+            id.setId("anyone");
+            id.setScheme("world");
+            ids = testACL;
+        }
         for (Id authId : ids) {
             if (authId.getScheme().equals("super")) {
                 return;
@@ -307,11 +318,19 @@ public class PrepRequestProcessor extends Thread implements RequestProcessor {
                                     zks.getTime(), type);
 
         switch (type) {
-            case OpCode.create:                
-                zks.sessionTracker.checkSession(request.sessionId, request.getOwner());
-                CreateRequest createRequest = (CreateRequest)record;   
+            case OpCode.create:
+            	/*
+            	 * pgaref mod
+            	 */
+            	if(request.sessionId != 2285l)
+            		zks.sessionTracker.checkSession(request.sessionId, request.getOwner());
+                CreateRequest createRequest = (CreateRequest)record;
+           //     LOG.info("pgaref - Before Serialization (request.request): "+ request.request.toString());
                 if(deserialize)
                     ByteBufferInputStream.byteBuffer2Record(request.request, createRequest);
+                // pgaref
+                LOG.info("pgaref - CREATE CHECK : " +  createRequest.toString() + " Path: " + createRequest.getPath() + " Data: " + createRequest.getData().toString() +
+   					 " ACL: "+  createRequest.getAcl().toString() + " Flags: "+ createRequest.getFlags());                
                 String path = createRequest.getPath();
                 int lastSlash = path.lastIndexOf('/');
                 if (lastSlash == -1 || path.indexOf('\0') != -1 || failCreate) {
@@ -334,9 +353,12 @@ public class PrepRequestProcessor extends Thread implements RequestProcessor {
                 if (createMode.isSequential()) {
                     path = path + String.format(Locale.ENGLISH, "%010d", parentCVersion);
                 }
-                try {
+                /*
+                 * pgaref mod - No need to validate
+                 */
+                 try{
                     PathUtils.validatePath(path);
-                } catch(IllegalArgumentException ie) {
+                } catch(IllegalArgumentException e) {
                     LOG.info("Invalid path " + path + " with session 0x" +
                             Long.toHexString(request.sessionId));
                     throw new KeeperException.BadArgumentsException(path);
@@ -502,13 +524,10 @@ public class PrepRequestProcessor extends Thread implements RequestProcessor {
      *
      * @param request
      */
-    /*
-     * pgaref- Touched
-     */
     @SuppressWarnings("unchecked")
     protected void pRequest(Request request) throws RequestProcessorException {
-         LOG.info("Prep>>> xid = " + request.cxid + " type = " +
-         request.type + " id = 0x" + Long.toHexString(request.sessionId) + " zxid "+ request.zxid +" SIZE: "+ request.request.capacity() );
+         System.out.println("Prep>>> cxid = " + request.cxid + " type = " +
+         request.type + " id = 0x" + Long.toHexString(request.sessionId));
         request.hdr = null;
         request.txn = null;
         
@@ -516,6 +535,13 @@ public class PrepRequestProcessor extends Thread implements RequestProcessor {
             switch (request.type) {
                 case OpCode.create:
                 CreateRequest createRequest = new CreateRequest();
+                /*if(request.sessionId != 2285l)
+                	pRequest2Txn(request.type, zks.getNextZxid(), request, createRequest, true);
+                
+                 * pgaref
+                 
+                else*/
+                LOG.info("pgaref - Request toString: "+ request.toString());
                 pRequest2Txn(request.type, zks.getNextZxid(), request, createRequest, true);
                 break;
             case OpCode.delete:
@@ -659,7 +685,12 @@ public class PrepRequestProcessor extends Thread implements RequestProcessor {
     }
 
     private List<ACL> removeDuplicates(List<ACL> acl) {
-
+    	/*
+    	 * pgaref 
+    	 */
+    	if(acl ==null){
+    		return ZooDefs.Ids.OPEN_ACL_UNSAFE;
+    	}
         ArrayList<ACL> retval = new ArrayList<ACL>();
         Iterator<ACL> it = acl.iterator();
         while (it.hasNext()) {

@@ -27,7 +27,6 @@ import java.util.HashSet;
 import javax.security.auth.login.Configuration;
 import javax.security.auth.login.LoginException;
 import javax.security.auth.login.AppConfigurationEntry;
-
 import javax.management.JMException;
 
 import org.apache.zookeeper.Login;
@@ -85,7 +84,7 @@ public abstract class ServerCnxnFactory {
 
     public abstract void start();
 
-    protected ZooKeeperServer zkServer;
+    public ZooKeeperServer zkServer;
     final public void setZooKeeperServer(ZooKeeperServer zk) {
         this.zkServer = zk;
         if (zk != null) {
@@ -206,4 +205,5 @@ public abstract class ServerCnxnFactory {
               + " ZooKeeper server to authenticate itself properly: " + e);
         }
     }
+    
 }
