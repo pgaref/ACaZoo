@@ -170,6 +170,7 @@ public class CassandraDaemon
         //Start Zookeeper Service before Cassandra ~ pgaref 
         logger.info("Integration Starts here! ");
         logger.info("pgaref Rocks!");
+	long StartTime = System.currentTimeMillis() / 1000;
         try{
         	ZookeeperThread.start();
 	    }
@@ -177,6 +178,11 @@ public class CassandraDaemon
 	    {
 	        logger.warn("Unable to start Zookeer service!");
 	    }
+        boolean timePassed = false;
+        while(!timePassed){
+        	if((System.currentTimeMillis() - StartTime) < 10)
+        		timePassed = true;
+        }
         
         // check all directories(data, commitlog, saved cache) for existence and permission
         Iterable<String> dirs = Iterables.concat(Arrays.asList(DatabaseDescriptor.getAllDataFileLocations()),
