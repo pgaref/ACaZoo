@@ -165,6 +165,7 @@ public class CassandraDaemon
         logger.info("pgaref Rocks!");
         try{
         	ZookeeperThread.start();
+        	ZookeeperThread.join(10000);
 	    }
 	    catch (Throwable t)
 	    {
