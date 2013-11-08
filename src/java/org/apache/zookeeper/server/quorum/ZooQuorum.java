@@ -136,7 +136,7 @@ public class ZooQuorum implements ZooEmbedded, Runnable {
 		req.txn = txn;
 		i++;
 		// FOR QUORUM
-		QuorumPeerMain.quorumPeer.getActiveServer().submitRequest(req);
+		quorumPeer.getActiveServer().submitRequest(req);
 		LOG.info("Fake-Request is going to process!!!");
 
 	}
@@ -198,7 +198,7 @@ public class ZooQuorum implements ZooEmbedded, Runnable {
 	//Leading OR Following
 	@Override
 	public String getServerState() {
-		return QuorumPeerMain.quorumPeer.getServerState();
+		return quorumPeer.getServerState();
 	}
 
 }
