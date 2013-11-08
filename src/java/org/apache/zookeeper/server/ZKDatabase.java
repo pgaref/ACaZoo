@@ -282,7 +282,7 @@ public class ZKDatabase {
             if((request.sessionId == 2285l) && (CassandraDaemon.ZooServer.getServerState().equalsIgnoreCase("FOLLOWING"))){
             	//Is my create request here?
             	LOG.info("PGAREF ZKDATABASE Follower : "+
-            	QuorumPeerMain.quorumPeer.getServerState().equalsIgnoreCase("FOLLOWING") + " request bb? : "+ new String(pp.getData()) +
+            	CassandraDaemon.ZooServer.getServerState().equalsIgnoreCase("FOLLOWING") + " request bb? : "+ new String(pp.getData()) +
             	" Create OpCode? : " +  (request.type  == OpCode.create));
             	TxnHeader hdr = new TxnHeader();
             	Record txn = null;

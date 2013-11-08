@@ -56,7 +56,7 @@ import org.apache.zookeeper.server.quorum.ZooStandalone;
  * Commit Log tracks every write operation into the system. The aim of the commit log is to be able to
  * successfully recover data that was not stored to disk via the Memtable.
  */
-public class CommitLog implements CommitLogMBean ,Watcher
+public class CommitLog implements CommitLogMBean
 {
     private static final Logger logger = LoggerFactory.getLogger(CommitLog.class);
 
@@ -234,7 +234,10 @@ public class CommitLog implements CommitLogMBean ,Watcher
 			}
     		org.apache.cassandra.service.CassandraDaemon.ZooServer.insertPersistent("/cassandra"+log_count, baos.toByteArray());
     		log_count++;
-    	}	
+    	}
+    	else{
+    		logger.info("pgaref - Follower - Commitlog called!!!");
+    	}
     	/*
     	if(QuorumPeerMain.getQuorumPeer().getServerState().equalsIgnoreCase("LEADING")){
         	logger.info("pgaref - Master: adding rowmutation in the CommitLog");
@@ -456,9 +459,9 @@ public class CommitLog implements CommitLogMBean ,Watcher
     /*
      * pgaref - Watcher
      * @see org.apache.zookeeper.Watcher#process(org.apache.zookeeper.WatchedEvent)
-     */
+     
 	@Override
 	synchronized public void process(WatchedEvent event) {
 	      System.out.println("CaZoo: Got a Write event " + event.toString());
-	  }
+	  }*/
 }
