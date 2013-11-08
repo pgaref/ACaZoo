@@ -276,35 +276,45 @@ public class ZKDatabase {
             QuorumPacket pp = new QuorumPacket(Leader.PROPOSAL, request.zxid,
                     baos.toByteArray(), null);
             
-            /*
-             * pgaref - Follower packet? I should use this Method to get commited transactions!
-             */
-            if((request.sessionId == 2285l) && (CassandraDaemon.ZooServer.getServerState().equalsIgnoreCase("FOLLOWING"))){
-            	//Is my create request here?
-            	LOG.info("PGAREF ZKDATABASE Follower : "+
-            	CassandraDaemon.ZooServer.getServerState().equalsIgnoreCase("FOLLOWING") + " request bb? : "+ new String(pp.getData()) +
-            	" Create OpCode? : " +  (request.type  == OpCode.create));
-            	TxnHeader hdr = new TxnHeader();
-            	Record txn = null;
-                try {
+			/*
+			 * pgaref - Follower packet? I should use this Method to get
+			 * commited transactions!
+			 */
+			if ((request.sessionId == 2285l)
+					&& (CassandraDaemon.ZooServer.getServerState()
+							.equalsIgnoreCase("FOLLOWING"))
+					&& (request.type == OpCode.create)) {
+				// Is my create request here?
+				LOG.info("PGAREF ZKDATABASE Follower : "
+						+ CassandraDaemon.ZooServer.getServerState()
+								.equalsIgnoreCase("FOLLOWING")
+						+ " request bb? : " + new String(pp.getData())
+						+ " Create OpCode? : "
+						+ (request.type == OpCode.create));
+				TxnHeader hdr = new TxnHeader();
+				Record txn = null;
+				try {
 					txn = SerializeUtils.deserializeTxn(pp.getData(), hdr);
 				} catch (IOException e) {
 					LOG.info("De - Serialization Error");
 				}
-                LOG.info("------------------------>>>>>>>>>>>>> pgaref FINALLY GOT -> "+ new String(((CreateTxn)txn).getData()));
-                //Deserialize and....
-                InputStream bInput = new ByteArrayInputStream(((CreateTxn)txn).getData());
-                DataInputStream in = new DataInputStream(bInput);
-                //CommitLog.instance.add(rm)
-                try {
-                	RowMutation tmp = RowMutation.serializer.deserialize(in, getVersion());
-                	CommitLog.instance.add(tmp);
+				LOG.info("------------------------> pgaref FINALLY GOT -> "
+						+ new String(((CreateTxn) txn).getData()));
+				// Deserialize and....
+				ByteArrayInputStream bInput = new ByteArrayInputStream(
+						((CreateTxn) txn).getData());
+				DataInputStream in = new DataInputStream(bInput);
+				try {
+					RowMutation tmp = RowMutation.serializer.deserialize(in,
+							getVersion());
+					
+					CommitLog.instance.add(tmp);
 				} catch (IOException e) {
 					LOG.error("pgaref - Deserialization FAILED!");
 				}
-                
-            }
-            //Ends here!
+
+			}
+			// Ends here!
             
             Proposal p = new Proposal();
             p.packet = pp;
