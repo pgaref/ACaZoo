@@ -31,7 +31,7 @@ public class ZooQuorum implements ZooEmbedded, Runnable {
 	private static final Logger LOG = LoggerFactory
 			.getLogger(ZooStandalone.class);
 
-	private static final String[] ZooArguments = { "./conf/zooQuorum.cfg" };
+	private static final String[] ZooArguments = { "./conf/zooConf/zooQuorum.cfg" };
 	public static QuorumPeer quorumPeer;
 	public static ServerCnxnFactory cnxnFactory;
 
@@ -87,7 +87,7 @@ public class ZooQuorum implements ZooEmbedded, Runnable {
 	public void insertPersistent(String blockname, byte[] data) {
 		// String blockname = "/foo";
 		// String data = "pgaref";
-		LOG.info("pgaref: Create Internal Called from Sync BENCHMARK");
+		LOG.info("pgaref: Create Internal Called from Cassandra add CommitLOG entry!");
 		int i = 0;
 		// pgaref -> 23 is the byte len of ZooDefs.Ids.OPEN_ACL_UNSAFE
 		int DataHeaderLength = 16 + blockname.length() + data.length + 23;
@@ -137,7 +137,7 @@ public class ZooQuorum implements ZooEmbedded, Runnable {
 		i++;
 		// FOR QUORUM
 		QuorumPeerMain.quorumPeer.getActiveServer().submitRequest(req);
-		LOG.info("is going to process!!!");
+		LOG.info("Fake-Request is going to process!!!");
 
 	}
 

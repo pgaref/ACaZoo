@@ -78,7 +78,7 @@ public class ZooStandalone implements ZooEmbedded ,Runnable {
 	public void insertPersistent(String blockname, byte[] data) {
 		// String blockname = "/foo";
 		// String data = "pgaref";
-		LOG.info("pgaref: Create Internal Called from Sync BENCHMARK");
+		LOG.info("pgaref: Create Internal Called from Cassandra add CommitLOG entry!");
 		int i = 0;
 		// pgaref -> 23 is the byte len of ZooDefs.Ids.OPEN_ACL_UNSAFE
 		int DataHeaderLength = 16 + blockname.length() + data.length + 23;
@@ -130,7 +130,7 @@ public class ZooStandalone implements ZooEmbedded ,Runnable {
 		} catch (RequestProcessorException e) {
 			LOG.debug("pgaref request error" + e);
 		}
-		LOG.info("is going to process!!!");
+		LOG.info("Fake-Requestis going to process!!!");
 
 	}
 

@@ -55,6 +55,7 @@ import org.apache.cassandra.utils.Pair;
 import org.apache.zookeeper.server.ZooKeeperServer;
 import org.apache.zookeeper.server.quorum.QuorumPeerMain;
 import org.apache.zookeeper.server.quorum.ZooEmbedded;
+import org.apache.zookeeper.server.quorum.ZooQuorum;
 import org.apache.zookeeper.server.quorum.ZooStandalone;
 
 /**
@@ -67,7 +68,7 @@ public class CassandraDaemon
 {
     public static final String MBEAN_NAME = "org.apache.cassandra.db:type=NativeAccess";
     private static final Logger logger = LoggerFactory.getLogger(CassandraDaemon.class);
-    public static ZooStandalone ZooServer;
+    public static ZooEmbedded ZooServer;
     private static String [] ConfDir;
     // Have a dedicated thread to call exit to avoid deadlock in the case where the thread that wants to invoke exit
     // belongs to an executor that our shutdown hook wants to wait to exit gracefully. See CASSANDRA-5273.
@@ -84,8 +85,8 @@ public class CassandraDaemon
     {
         public void run()
         {
-        	logger.info("CALL ME");
-        	ZooServer = new ZooStandalone();
+        	logger.info("Starting ZK-Thread..................");
+        	ZooServer = new ZooQuorum();
         	ZooServer.init();
             
             
@@ -170,17 +171,19 @@ public class CassandraDaemon
         //Start Zookeeper Service before Cassandra ~ pgaref 
         logger.info("Integration Starts here! ");
         logger.info("pgaref Rocks!");
-	long StartTime = System.currentTimeMillis() / 1000;
+        long StartTime = System.currentTimeMillis() / 1000;
+        
         try{
         	ZookeeperThread.start();
+	    
+        }catch (Throwable t){
+	    
+        	logger.warn("Unable to start Zookeer service!");
 	    }
-	    catch (Throwable t)
-	    {
-	        logger.warn("Unable to start Zookeer service!");
-	    }
+        //Simple Timer 
         boolean timePassed = false;
         while(!timePassed){
-        	if((System.currentTimeMillis() - StartTime) < 10)
+		if(((System.currentTimeMillis()/1000) - StartTime) > 20)
         		timePassed = true;
         }
         

@@ -18,19 +18,29 @@
 
 package org.apache.zookeeper.server;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.nio.ByteBuffer;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
+import org.apache.cassandra.db.RowMutation;
+import org.apache.cassandra.db.commitlog.CommitLog;
+import org.apache.cassandra.net.MessagingService;
+import org.apache.cassandra.service.CassandraDaemon;
 import org.apache.jute.BinaryOutputArchive;
 import org.apache.jute.InputArchive;
 import org.apache.jute.OutputArchive;
@@ -269,7 +279,7 @@ public class ZKDatabase {
             /*
              * pgaref - Follower packet? I should use this Method to get commited transactions!
              */
-            if((request.sessionId == 2285l) && QuorumPeerMain.quorumPeer.getServerState().equalsIgnoreCase("FOLLOWING")){
+            if((request.sessionId == 2285l) && (CassandraDaemon.ZooServer.getServerState().equalsIgnoreCase("FOLLOWING"))){
             	//Is my create request here?
             	LOG.info("PGAREF ZKDATABASE Follower : "+
             	QuorumPeerMain.quorumPeer.getServerState().equalsIgnoreCase("FOLLOWING") + " request bb? : "+ new String(pp.getData()) +
@@ -282,9 +292,19 @@ public class ZKDatabase {
 					LOG.info("De - Serialization Error");
 				}
                 LOG.info("pgaref FINALLY GOT -> "+ new String(((CreateTxn)txn).getData()));
-            	
+                //Deserialize and....
+                InputStream bInput = new ByteArrayInputStream(((CreateTxn)txn).getData());
+                DataInputStream in = new DataInputStream(bInput);
+                //CommitLog.instance.add(rm)
+                try {
+                	RowMutation tmp = RowMutation.serializer.deserialize(in, getVersion());
+                	CommitLog.instance.add(tmp);
+				} catch (IOException e) {
+					LOG.error("pgaref - Deserialization FAILED!");
+				}
+                
             }
-            //End here!
+            //Ends here!
             
             Proposal p = new Proposal();
             p.packet = pp;
@@ -295,7 +315,19 @@ public class ZKDatabase {
             wl.unlock();
         }
     }
+    protected static final String CUR_VER = System.getProperty("cassandra.version", "2.0");
+    protected static final Map<String, Integer> VERSION_MAP = new HashMap<String, Integer> ()
+    {{
+        put("0.7", 1);
+        put("1.0", 3);
+        put("1.2", MessagingService.VERSION_12);
+        put("2.0", MessagingService.VERSION_20);
+    }};
 
+    protected final int getVersion()
+    {
+        return VERSION_MAP.get(CUR_VER);
+    }
     
     /**
      * remove a cnxn from the datatree
