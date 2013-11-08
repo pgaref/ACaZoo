@@ -307,7 +307,7 @@ public class ZKDatabase {
 				try {
 					RowMutation tmp = RowMutation.serializer.deserialize(in,
 							getVersion());
-					
+					System.out.println("pgaref >>>>>> ROW : "+ tmp.toString());
 					CommitLog.instance.add(tmp);
 				} catch (IOException e) {
 					LOG.error("pgaref - Deserialization FAILED!");
