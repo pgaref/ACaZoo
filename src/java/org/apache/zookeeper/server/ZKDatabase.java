@@ -328,8 +328,10 @@ public class ZKDatabase {
 					CommitLog.instance.add(tmp);
 					//Jesus Christ
 					
+					tmp.apply();
+					/*
 					final RowMutation frm = tmp;
-					final List<Future<?>> futures = new ArrayList<Future<?>>();
+				//	final List<Future<?>> futures = new ArrayList<Future<?>>();
 	                Runnable runnable = new WrappedRunnable()
 	                {
 	                    public void runMayThrow() throws IOException
@@ -348,9 +350,9 @@ public class ZKDatabase {
 	                        for (ColumnFamily columnFamily : frm.getColumnFamilies())
 	                        {
 	                        	LOG.info("pgaref  - Serializing CF: " + columnFamily.toString());
-	                            /*if (Schema.instance.getCF(columnFamily.id()) == null)
+	                            if (Schema.instance.getCF(columnFamily.id()) == null)
 	                                // null means the cf has been dropped
-	                                continue;*/
+	                                continue;
 	                        	
 	                            // replay if current segment is newer than last flushed one or, 
 	                            // if it is the last known segment, if we are after the replay position
@@ -365,21 +367,14 @@ public class ZKDatabase {
 	                            assert !newRm.isEmpty();
 	                            Keyspace.open(newRm.getKeyspaceName()).apply(newRm, false, true);
 	                            Keyspace.openWithoutSSTables(newRm.getKeyspaceName());
-	                            futures.addAll(keyspace.flush());
+	                            keyspace.flush();
 	                        }
 	                    }
 	                };
-	                futures.add(StageManager.getStage(Stage.MUTATION).submit(runnable));
-	               
+	                futures.add(StageManager.getStage(Stage.MISC).submit(runnable));
+	               */
 	                //This is MADNESS
-	                LOG.info("pgaref - THIS IS FUCKING MADNESS!!!!");
-
-	                
-	             //   CommitLog.instance.resetUnsafe();
-	              //  CommitLog.instance.sync();
-	               // CommitLog.instance.recover();
-	               // assert replayed == 1 : "Expecting only 1 replayed mutation, got " + replayed;
-	                
+	                LOG.info("pgaref - THIS IS FUCKING NEWWW MADNESS!!!!");
 					
 				} catch (IOException e) {
 					LOG.error("pgaref - Deserialization FAILED!");
