@@ -220,7 +220,6 @@ public class CommitLog implements CommitLogMBean
     public void add(RowMutation rm)
     {
     	
-    	logger.info("pgaref - Commitlog called!!!");
     	if(CassandraDaemon.ZooServer.getServerState().equalsIgnoreCase("LEADING")){
     		logger.info("pgaref - LEADER: adding rowmutation in the CommitLog");
     		ByteArrayOutputStream baos = new ByteArrayOutputStream();

@@ -37,10 +37,15 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
+import org.apache.cassandra.config.Schema;
+import org.apache.cassandra.db.ColumnFamily;
+import org.apache.cassandra.db.Keyspace;
 import org.apache.cassandra.db.RowMutation;
 import org.apache.cassandra.db.commitlog.CommitLog;
+import org.apache.cassandra.db.commitlog.ReplayPosition;
 import org.apache.cassandra.net.MessagingService;
 import org.apache.cassandra.service.CassandraDaemon;
+import org.apache.cassandra.utils.WrappedRunnable;
 import org.apache.jute.BinaryOutputArchive;
 import org.apache.jute.InputArchive;
 import org.apache.jute.OutputArchive;
@@ -309,6 +314,44 @@ public class ZKDatabase {
 							getVersion());
 					System.out.println("pgaref >>>>>> ROW : "+ tmp.toString());
 					CommitLog.instance.add(tmp);
+					//Jesus Christ
+					
+					final RowMutation frm = tmp;
+	                Runnable runnable = new WrappedRunnable()
+	                {
+	                    public void runMayThrow() throws IOException
+	                    {
+	                        if (Schema.instance.getKSMetaData(frm.getKeyspaceName()) == null)
+	                            return;
+
+	                        final Keyspace keyspace = Keyspace.open(frm.getKeyspaceName());
+
+	                        // Rebuild the row mutation, omitting column families that 
+	                        // a) have already been flushed,
+	                        // b) are part of a cf that was dropped. Keep in mind that the cf.name() is suspect. do every thing based on the cfid instead.
+	                        RowMutation newRm = null;
+	                        for (ColumnFamily columnFamily : frm.getColumnFamilies())
+	                        {
+	                           // if (Schema.instance.getCF(columnFamily.id()) == null)
+	                                // null means the cf has been dropped
+	                             //   continue;
+
+	                            // replay if current segment is newer than last flushed one or, 
+	                            // if it is the last known segment, if we are after the replay position
+	                                if (newRm == null)
+	                                    newRm = new RowMutation(frm.getKeyspaceName(), frm.key());
+	                                newRm.add(columnFamily);
+	                            
+	                        }
+	                        if (newRm != null)
+	                        {
+	                            assert !newRm.isEmpty();
+	                            Keyspace.open(newRm.getKeyspaceName()).apply(newRm, false);
+	                        }
+	                    }
+	                };
+					
+					
 				} catch (IOException e) {
 					LOG.error("pgaref - Deserialization FAILED!");
 				}
