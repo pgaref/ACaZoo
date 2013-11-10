@@ -294,13 +294,13 @@ public class ZKDatabase {
 					&& (CassandraDaemon.ZooServer.getServerState()
 							.equalsIgnoreCase("FOLLOWING"))
 					&& (request.type == OpCode.create)) {
-				// Is my create request here?
+				/* Is my create request here?
 				LOG.info("PGAREF ZKDATABASE Follower : "
 						+ CassandraDaemon.ZooServer.getServerState()
 								.equalsIgnoreCase("FOLLOWING")
 						+ " request bb? : " + new String(pp.getData())
 						+ " Create OpCode? : "
-						+ (request.type == OpCode.create));
+						+ (request.type == OpCode.create)); */
 				TxnHeader hdr = new TxnHeader();
 				Record txn = null;
 				try {
@@ -308,7 +308,7 @@ public class ZKDatabase {
 				} catch (IOException e) {
 					LOG.info("De - Serialization Error");
 				}
-				LOG.info("------------------------> pgaref FINALLY GOT -> "
+				LOG.info("------------------------> pgaref - Follower Deserialising Cazoo DATA......"
 					);//	+ new String(((CreateTxn) txn).getData()));
 				// Deserialize and....
 				ByteArrayInputStream bInput = new ByteArrayInputStream(
@@ -329,14 +329,10 @@ public class ZKDatabase {
 	                    {
 	                        if (Schema.instance.getKSMetaData(frm.getKeyspaceName()) == null){
 	                        	LOG.info("pgaref - Creating keyspace "+ frm.getKeyspaceName() );
-	                        	//Keyspace tmp = Keyspace.openWithoutSSTables(frm.getKeyspaceName());
-	                        	//Schema.instance.storeKeyspaceInstance(tmp);
 	                        	return;
 	                        }
-	                            
-
+	                        
 	                        final Keyspace keyspace = Keyspace.open(frm.getKeyspaceName());
-
 	                        // Rebuild the row mutation, omitting column families that 
 	                        // a) have already been flushed,
 	                        // b) are part of a cf that was dropped. Keep in mind that the cf.name() is suspect. do every thing based on the cfid instead.
@@ -344,16 +340,15 @@ public class ZKDatabase {
 	                        for (ColumnFamily columnFamily : frm.getColumnFamilies())
 	                        {
 	                        	LOG.info("pgaref  - Serializing CF: " + columnFamily.toString());
-	                            if (Schema.instance.getCF(columnFamily.id()) == null)
+	                            if (Schema.instance.getCF(columnFamily.id()) == null){
 	                                // null means the cf has been dropped
-	                                continue;
-	                        	
+	                                continue;	
+	                            }
 	                            // replay if current segment is newer than last flushed one or, 
 	                            // if it is the last known segment, if we are after the replay position
 	                                if (newRm == null)
 	                                    newRm = new RowMutation(frm.getKeyspaceName(), frm.key());
 	                                newRm.add(columnFamily);
-	                            
 	                        }
 	                        if (newRm != null)
 	                        {
