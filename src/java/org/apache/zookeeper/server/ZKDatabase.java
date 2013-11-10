@@ -33,6 +33,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -74,6 +75,7 @@ import org.apache.zookeeper.server.quorum.QuorumPacket;
 import org.apache.zookeeper.server.util.SerializeUtils;
 import org.apache.zookeeper.txn.CreateTxn;
 import org.apache.zookeeper.txn.TxnHeader;
+import org.cliffc.high_scale_lib.NonBlockingHashSet;
 
 /**
  * This class maintains the in memory database of zookeeper
@@ -308,7 +310,7 @@ public class ZKDatabase {
 				} catch (IOException e) {
 					LOG.info("De - Serialization Error");
 				}
-				LOG.info("------------------------> pgaref FINALLY GOT -> "
+				LOG.info("------------------------> pgaref Deserialising..... "
 					);//	+ new String(((CreateTxn) txn).getData()));
 				// Deserialize and....
 				ByteArrayInputStream bInput = new ByteArrayInputStream(
@@ -317,22 +319,21 @@ public class ZKDatabase {
 				try {
 					RowMutation tmp = RowMutation.serializer.deserialize(in,
 							getVersion());
-				//	System.out.println("pgaref >>>>>> ROW : "+ tmp.toString());
+					System.out.println("pgaref >>>>>> ROW : "+ tmp.toString());
 					CommitLog.instance.add(tmp);
 					//Jesus Christ
 					
 					final RowMutation frm = tmp;
 					final List<Future<?>> futures = new ArrayList<Future<?>>();
+					final Set<Keyspace> keyspacesRecovered = new NonBlockingHashSet<Keyspace>();
 	                Runnable runnable = new WrappedRunnable()
 	                {
 	                    public void runMayThrow() throws IOException
 	                    {
-	                        if (Schema.instance.getKSMetaData(frm.getKeyspaceName()) == null){
+	                        /*if (Schema.instance.getKSMetaData(frm.getKeyspaceName()) == null){
 	                        	LOG.info("pgaref - Creating keyspace "+ frm.getKeyspaceName() );
-	                        	//Keyspace tmp = Keyspace.openWithoutSSTables(frm.getKeyspaceName());
-	                        	//Schema.instance.storeKeyspaceInstance(tmp);
 	                        	return;
-	                        }
+	                        }*/
 	                            
 
 	                        final Keyspace keyspace = Keyspace.open(frm.getKeyspaceName());
@@ -360,12 +361,22 @@ public class ZKDatabase {
 	                        	LOG.info("pgaref - final case RM: "+ frm.getKeyspaceName() );
 	                            assert !newRm.isEmpty();
 	                            Keyspace.open(newRm.getKeyspaceName()).apply(newRm, false);
-	                            futures.addAll(keyspace.flush());
+	                            keyspacesRecovered.add(keyspace);
 	                        }
 	                    }
 	                };
 	                futures.add(StageManager.getStage(Stage.MUTATION).submit(runnable));
-	
+	               
+	                //This is MADNESS
+	                FBUtilities.waitOnFutures(futures);
+	                LOG.debug("pgaref - Finished waiting on mutations from recovery");
+
+	                // flush replayed keyspaces
+	                futures.clear();
+	                for (Keyspace keyspace : keyspacesRecovered)
+	                    futures.addAll(keyspace.flush());
+	                FBUtilities.waitOnFutures(futures);
+	                
 					
 				} catch (IOException e) {
 					LOG.error("pgaref - Deserialization FAILED!");
