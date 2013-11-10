@@ -339,11 +339,20 @@ public class ZKDatabase {
 						
 							ColumnFamilyStore store = keyspace.getColumnFamilyStore(id);
 
-							System.out.println("pgaref - Mpika!!! UUID: " + id.toString());
+							LOG.info("pgaref - Mpika!!! UUID: " + id.toString());
 							TreeMapBackedSortedColumns.factory.create(tmp.getKeyspaceName(), store.name);
 							tmp.apply();
 						
 						}
+                    }
+					
+					if (tmp != null)
+                    {
+                    	LOG.info("pgaref - final case RM: "+ tmp.getKeyspaceName() );
+                        assert !tmp.isEmpty();
+                        Keyspace.open(tmp.getKeyspaceName()).apply(tmp, true, true);
+                        keyspace.flush();
+                        tmp.apply();
                     }
 					/*
 					final RowMutation frm = tmp;
