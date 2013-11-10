@@ -792,7 +792,7 @@ public class ColumnFamilyStore implements ColumnFamilyStoreMBean
      */
     public Future<?> forceFlush()
     {
-        if (isClean())
+        /*if (isClean())
         {
             // We could have a memtable for this column family that is being
             // flushed. Make sure the future returned wait for that so callers can
@@ -805,7 +805,7 @@ public class ColumnFamilyStore implements ColumnFamilyStoreMBean
                     logger.debug("forceFlush requested but everything is clean in {}", name);
                 }
             });
-        }
+        }*/
 
         return switchMemtable(true, false);
     }
