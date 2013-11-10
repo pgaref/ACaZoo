@@ -50,8 +50,10 @@ import org.apache.cassandra.db.commitlog.CommitLog;
 import org.apache.cassandra.db.commitlog.ReplayPosition;
 import org.apache.cassandra.net.MessagingService;
 import org.apache.cassandra.service.CassandraDaemon;
+import org.apache.cassandra.utils.ByteBufferUtil;
 import org.apache.cassandra.utils.FBUtilities;
 import org.apache.cassandra.utils.WrappedRunnable;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.jute.BinaryOutputArchive;
 import org.apache.jute.InputArchive;
 import org.apache.jute.OutputArchive;
@@ -320,6 +322,9 @@ public class ZKDatabase {
 					RowMutation tmp = RowMutation.serializer.deserialize(in,
 							getVersion());
 					System.out.println("pgaref >>>>>> ROW : "+ tmp.toString());
+					LOG.debug(String.format("replaying mutation for %s.%s: %s", tmp.getKeyspaceName(), ByteBufferUtil.bytesToHex(tmp.key()), "{" + StringUtils.join(tmp.getColumnFamilies().iterator(), ", ")
+                            + "}"));
+
 					CommitLog.instance.add(tmp);
 					//Jesus Christ
 					
@@ -330,11 +335,10 @@ public class ZKDatabase {
 	                {
 	                    public void runMayThrow() throws IOException
 	                    {
-	                        /*if (Schema.instance.getKSMetaData(frm.getKeyspaceName()) == null){
+	                        if (Schema.instance.getKSMetaData(frm.getKeyspaceName()) == null){
 	                        	LOG.info("pgaref - Creating keyspace "+ frm.getKeyspaceName() );
 	                        	return;
-	                        }*/
-	                            
+	                        }
 
 	                        final Keyspace keyspace = Keyspace.open(frm.getKeyspaceName());
 
