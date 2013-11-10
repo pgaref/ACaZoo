@@ -368,14 +368,13 @@ public class ZKDatabase {
 	                futures.add(StageManager.getStage(Stage.MUTATION).submit(runnable));
 	               
 	                //This is MADNESS
-	                FBUtilities.waitOnFutures(futures);
 	                LOG.debug("pgaref - Finished waiting on mutations from recovery");
 
 	                // flush replayed keyspaces
 	                futures.clear();
 	                for (Keyspace keyspace : keyspacesRecovered)
 	                    futures.addAll(keyspace.flush());
-	                FBUtilities.waitOnFutures(futures);
+	                
 	                
 					
 				} catch (IOException e) {
