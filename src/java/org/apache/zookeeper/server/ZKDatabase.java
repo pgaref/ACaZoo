@@ -379,8 +379,8 @@ public class ZKDatabase {
 	                    futures.addAll(keyspace.flush());
 	                
 	                CommitLog.instance.resetUnsafe();
-	                int replayed = CommitLog.instance.recover();
-	                assert replayed == 1 : "Expecting only 1 replayed mutation, got " + replayed;
+	                CommitLog.instance.recover();
+	               // assert replayed == 1 : "Expecting only 1 replayed mutation, got " + replayed;
 	                
 					
 				} catch (IOException e) {
