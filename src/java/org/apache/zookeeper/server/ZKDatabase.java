@@ -34,6 +34,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -44,8 +45,10 @@ import org.apache.cassandra.concurrent.Stage;
 import org.apache.cassandra.concurrent.StageManager;
 import org.apache.cassandra.config.Schema;
 import org.apache.cassandra.db.ColumnFamily;
+import org.apache.cassandra.db.ColumnFamilyStore;
 import org.apache.cassandra.db.Keyspace;
 import org.apache.cassandra.db.RowMutation;
+import org.apache.cassandra.db.TreeMapBackedSortedColumns;
 import org.apache.cassandra.db.commitlog.CommitLog;
 import org.apache.cassandra.db.commitlog.ReplayPosition;
 import org.apache.cassandra.net.MessagingService;
@@ -326,9 +329,22 @@ public class ZKDatabase {
                             + "}"));
 
 					CommitLog.instance.add(tmp);
+					Keyspace keyspace = Keyspace.open(tmp.getKeyspaceName());
 					//Jesus Christ
-					
-					tmp.apply();
+					for (ColumnFamily columnFamily : tmp.getColumnFamilies())
+                    {
+						Schema.instance.storeKeyspaceInstance(keyspace);
+						Collection<UUID> cl = tmp.getColumnFamilyIds();
+						for(UUID id : cl){
+						
+							ColumnFamilyStore store = keyspace.getColumnFamilyStore(id);
+
+							System.out.println("pgaref - Mpika!!! UUID: " + id.toString());
+							TreeMapBackedSortedColumns.factory.create(tmp.getKeyspaceName(), store.name);
+							tmp.apply();
+						
+						}
+                    }
 					/*
 					final RowMutation frm = tmp;
 				//	final List<Future<?>> futures = new ArrayList<Future<?>>();
