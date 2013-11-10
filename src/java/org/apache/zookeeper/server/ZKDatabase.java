@@ -50,6 +50,8 @@ import org.apache.cassandra.db.Keyspace;
 import org.apache.cassandra.db.RowMutation;
 import org.apache.cassandra.db.TreeMapBackedSortedColumns;
 import org.apache.cassandra.db.commitlog.CommitLog;
+import org.apache.cassandra.db.commitlog.CommitLogReplayer;
+import org.apache.cassandra.db.commitlog.MyRowMutationReplayer;
 import org.apache.cassandra.db.commitlog.ReplayPosition;
 import org.apache.cassandra.net.MessagingService;
 import org.apache.cassandra.service.CassandraDaemon;
@@ -325,80 +327,15 @@ public class ZKDatabase {
 					RowMutation tmp = RowMutation.serializer.deserialize(in,
 							getVersion());
 					LOG.info("pgaref >>>>>> ROW : "+ tmp.toString());
-					LOG.info(String.format("replaying mutation for %s.%s: %s", tmp.getKeyspaceName(), ByteBufferUtil.bytesToHex(tmp.key()), "{" + StringUtils.join(tmp.getColumnFamilies().iterator(), ", ")
-                            + "}"));
-
+				//	LOG.info(String.format("replaying mutation for %s.%s: %s", tmp.getKeyspaceName(), ByteBufferUtil.bytesToHex(tmp.key()), "{" + StringUtils.join(tmp.getColumnFamilies().iterator(), ", ")
+                 //           + "}"));
+					{
+						MyRowMutationReplayer recovery = new MyRowMutationReplayer();
+				        recovery.recover(tmp);
+				        recovery.blockForWrites();
+						
+					}
 					CommitLog.instance.add(tmp);
-					Keyspace keyspace = Keyspace.open(tmp.getKeyspaceName());
-					// Jesus Christ
-					// Schema.instance.storeKeyspaceInstance(keyspace);
-					Collection<UUID> cl = tmp.getColumnFamilyIds();
-					for (UUID id : cl) {
-
-						ColumnFamilyStore store = keyspace
-								.getColumnFamilyStore(id);
-
-						LOG.info("pgaref - Mpika!!! UUID: " + id.toString());
-						TreeMapBackedSortedColumns.factory.create(
-								tmp.getKeyspaceName(), store.name);
-						tmp.apply();
-
-					}
-
-					if (tmp != null) {
-						LOG.info("pgaref - final case RM: "
-								+ tmp.getKeyspaceName());
-						assert !tmp.isEmpty();
-						Keyspace.open(tmp.getKeyspaceName()).apply(tmp, true,
-								true);
-						keyspace.flush();
-						tmp.apply();
-					}
-					/*
-					final RowMutation frm = tmp;
-				//	final List<Future<?>> futures = new ArrayList<Future<?>>();
-	                Runnable runnable = new WrappedRunnable()
-	                {
-	                    public void runMayThrow() throws IOException
-	                    {
-	                        if (Schema.instance.getKSMetaData(frm.getKeyspaceName()) == null){
-	                        	LOG.info("pgaref - Creating keyspace "+ frm.getKeyspaceName() );
-	                        	return;
-	                        }
-
-	                        final Keyspace keyspace = Keyspace.open(frm.getKeyspaceName());
-
-	                        // Rebuild the row mutation, omitting column families that 
-	                        // a) have already been flushed,
-	                        // b) are part of a cf that was dropped. Keep in mind that the cf.name() is suspect. do every thing based on the cfid instead.
-	                        RowMutation newRm = null;
-	                        for (ColumnFamily columnFamily : frm.getColumnFamilies())
-	                        {
-	                        	LOG.info("pgaref  - Serializing CF: " + columnFamily.toString());
-	                            if (Schema.instance.getCF(columnFamily.id()) == null)
-	                                // null means the cf has been dropped
-	                                continue;
-	                        	
-	                            // replay if current segment is newer than last flushed one or, 
-	                            // if it is the last known segment, if we are after the replay position
-	                                if (newRm == null)
-	                                    newRm = new RowMutation(frm.getKeyspaceName(), frm.key());
-	                                newRm.add(columnFamily);
-	                            
-	                        }
-	                        if (newRm != null)
-	                        {
-	                        	LOG.info("pgaref - final case RM: "+ frm.getKeyspaceName() );
-	                            assert !newRm.isEmpty();
-	                            Keyspace.open(newRm.getKeyspaceName()).apply(newRm, false, true);
-	                            Keyspace.openWithoutSSTables(newRm.getKeyspaceName());
-	                            keyspace.flush();
-	                        }
-	                    }
-	                };
-	                futures.add(StageManager.getStage(Stage.MISC).submit(runnable));
-	               */
-	                //This is MADNESS
 	                LOG.info("pgaref - THIS IS FUCKING NEWWW MADNESS!!!!");
 					
 				} catch (IOException e) {
