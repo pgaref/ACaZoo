@@ -355,7 +355,9 @@ public class ZKDatabase {
 	                        {
 	                        	LOG.info("pgaref - final case RM: "+ frm.getKeyspaceName() );
 	                            assert !newRm.isEmpty();
-	                            Keyspace.open(newRm.getKeyspaceName()).apply(newRm, false);
+	                            Keyspace tmp = Keyspace.openWithoutSSTables(frm.getKeyspaceName());
+	                        	Schema.instance.storeKeyspaceInstance(tmp);
+	                           // Keyspace.open(newRm.getKeyspaceName()).apply(newRm, false);
 	                        }
 	                    }
 	                };
