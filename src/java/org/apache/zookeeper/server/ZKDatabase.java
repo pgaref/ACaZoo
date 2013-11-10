@@ -322,6 +322,7 @@ public class ZKDatabase {
 	                    public void runMayThrow() throws IOException
 	                    {
 	                        if (Schema.instance.getKSMetaData(frm.getKeyspaceName()) == null){
+	                        	LOG.info("pgaref - Creating keyspace "+ frm.getKeyspaceName() );
 	                        	Keyspace tmp = Keyspace.openWithoutSSTables(frm.getKeyspaceName());
 	                        	Schema.instance.storeKeyspaceInstance(tmp);
 	                        	return;
@@ -336,7 +337,7 @@ public class ZKDatabase {
 	                        RowMutation newRm = null;
 	                        for (ColumnFamily columnFamily : frm.getColumnFamilies())
 	                        {
-	                        	LOG.info("Serializing CF: " + columnFamily.toString());
+	                        	LOG.info("pgaref  - Serializing CF: " + columnFamily.toString());
 	                            if (Schema.instance.getCF(columnFamily.id()) == null)
 	                                // null means the cf has been dropped
 	                                continue;
