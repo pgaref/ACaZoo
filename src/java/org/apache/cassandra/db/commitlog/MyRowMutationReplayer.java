@@ -150,12 +150,12 @@ public class MyRowMutationReplayer {
 					assert !newRm.isEmpty();
 					Keyspace.open(newRm.getKeyspaceName()).apply(newRm, false, true);
 					keyspacesRecovered.add(keyspace);
-				/*	KSMetaData ksm = Schema.instance.getKSMetaData(keyspace.getName());
+					KSMetaData ksm = Schema.instance.getKSMetaData(keyspace.getName());
 					try {
 						MigrationManager.announceNewKeyspace(ksm);
 					} catch (ConfigurationException e) {
 						Log.info("pgarer -FAILED TO ANNOUCE NEW SCHEMA");
-					}*/
+					}
 				}
 			}
 		};
