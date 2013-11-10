@@ -368,12 +368,15 @@ public class ZKDatabase {
 	                futures.add(StageManager.getStage(Stage.MUTATION).submit(runnable));
 	               
 	                //This is MADNESS
-	                LOG.info("pgaref - Finished waiting on mutations from recovery");
+	                LOG.info("pgaref - THIS IS FUCKING MADNESS!!!!");
 
-	                // flush replayed keyspaces
+	                /* flush replayed keyspaces
 	                for (Keyspace keyspace : keyspacesRecovered)
 	                    futures.addAll(keyspace.flush());
-	                
+	                */
+	                CommitLog.instance.resetUnsafe();
+	                int replayed = CommitLog.instance.recover();
+	                assert replayed == 1 : "Expecting only 1 replayed mutation, got " + replayed;
 	                
 					
 				} catch (IOException e) {
