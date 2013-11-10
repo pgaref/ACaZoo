@@ -19,16 +19,20 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.cassandra.concurrent.Stage;
 import org.apache.cassandra.concurrent.StageManager;
+import org.apache.cassandra.config.KSMetaData;
 import org.apache.cassandra.config.Schema;
 import org.apache.cassandra.db.ColumnFamily;
 import org.apache.cassandra.db.ColumnFamilyStore;
 import org.apache.cassandra.db.Keyspace;
 import org.apache.cassandra.db.RowMutation;
 import org.apache.cassandra.db.SystemKeyspace;
+import org.apache.cassandra.exceptions.ConfigurationException;
+import org.apache.cassandra.service.MigrationManager;
 import org.apache.cassandra.utils.FBUtilities;
 import org.apache.cassandra.utils.Pair;
 import org.apache.cassandra.utils.WrappedRunnable;
 import org.cliffc.high_scale_lib.NonBlockingHashSet;
+import org.mortbay.log.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -148,6 +152,12 @@ public class MyRowMutationReplayer {
 					assert !newRm.isEmpty();
 					Keyspace.open(newRm.getKeyspaceName()).apply(newRm, false);
 					keyspacesRecovered.add(keyspace);
+					KSMetaData ksm = Schema.instance.getKSMetaData(keyspace.getName());
+					try {
+						MigrationManager.announceNewKeyspace(ksm);
+					} catch (ConfigurationException e) {
+						Log.info("pgarer -FAILED TO ANNOUCE NEW SCHEMA");
+					}
 				}
 			}
 		};
