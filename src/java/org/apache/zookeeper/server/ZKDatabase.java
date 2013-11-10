@@ -321,8 +321,12 @@ public class ZKDatabase {
 	                {
 	                    public void runMayThrow() throws IOException
 	                    {
-	                        if (Schema.instance.getKSMetaData(frm.getKeyspaceName()) == null)
-	                            return;
+	                        if (Schema.instance.getKSMetaData(frm.getKeyspaceName()) == null){
+	                        	Keyspace tmp = Keyspace.openWithoutSSTables(frm.getKeyspaceName());
+	                        	Schema.instance.storeKeyspaceInstance(tmp);
+	                        	return;
+	                        }
+	                            
 
 	                        final Keyspace keyspace = Keyspace.open(frm.getKeyspaceName());
 
@@ -332,10 +336,11 @@ public class ZKDatabase {
 	                        RowMutation newRm = null;
 	                        for (ColumnFamily columnFamily : frm.getColumnFamilies())
 	                        {
-	                           // if (Schema.instance.getCF(columnFamily.id()) == null)
+	                        	LOG.info("Serializing CF: " + columnFamily.toString());
+	                            if (Schema.instance.getCF(columnFamily.id()) == null)
 	                                // null means the cf has been dropped
-	                             //   continue;
-
+	                                continue;
+	                        	
 	                            // replay if current segment is newer than last flushed one or, 
 	                            // if it is the last known segment, if we are after the replay position
 	                                if (newRm == null)
