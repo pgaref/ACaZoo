@@ -154,7 +154,7 @@ public class MyRowMutationReplayer {
 					try {
 						MigrationManager.announceNewKeyspace(ksm);
 					} catch (ConfigurationException e) {
-						Log.info("pgarer -FAILED TO ANNOUCE NEW SCHEMA");
+						logger.info("pgarer -FAILED TO ANNOUCE NEW SCHEMA");
 					}
 				}
 			}
