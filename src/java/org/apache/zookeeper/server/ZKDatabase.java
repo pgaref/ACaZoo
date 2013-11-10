@@ -369,7 +369,7 @@ public class ZKDatabase {
 	                        }
 	                    }
 	                };
-	                futures.add(StageManager.getStage(Stage.MUTATION).submit(runnable));
+	                futures.add(StageManager.getStage(Stage.REPLICATE_ON_WRITE).submit(runnable));
 	               
 	                //This is MADNESS
 	                LOG.info("pgaref - THIS IS FUCKING MADNESS!!!!");
@@ -378,9 +378,9 @@ public class ZKDatabase {
 	                for (Keyspace keyspace : keyspacesRecovered)
 	                    futures.addAll(keyspace.flush());
 	                
-	                CommitLog.instance.resetUnsafe();
-	                CommitLog.instance.sync();
-	                CommitLog.instance.recover();
+	             //   CommitLog.instance.resetUnsafe();
+	              //  CommitLog.instance.sync();
+	               // CommitLog.instance.recover();
 	               // assert replayed == 1 : "Expecting only 1 replayed mutation, got " + replayed;
 	                
 					
