@@ -112,59 +112,48 @@ public class MyRowMutationReplayer {
 		logger.info("pgaref - Replaying {}", rm.toString());
 
 		final RowMutation frm = rm;
-		Runnable runnable = new WrappedRunnable() {
-			public void runMayThrow() throws IOException {
-				if (Schema.instance.getKSMetaData(frm.getKeyspaceName()) == null)
-					return;
+		if (Schema.instance.getKSMetaData(frm.getKeyspaceName()) == null)
+			return;
 
-				final Keyspace keyspace = Keyspace.open(frm.getKeyspaceName());
+		final Keyspace keyspace = Keyspace.open(frm.getKeyspaceName());
 
-				// Rebuild the row mutation, omitting column families that
-				// a) have already been flushed,
-				// b) are part of a cf that was dropped. Keep in mind that the
-				// cf.name() is suspect. do every thing based on the cfid
-				// instead.
-				RowMutation newRm = null;
-				for (ColumnFamily columnFamily : frm.getColumnFamilies()) {
-					if (Schema.instance.getCF(columnFamily.id()) == null)
-						// null means the cf has been dropped
-						continue;
+		// Rebuild the row mutation, omitting column families that
+		// a) have already been flushed,
+		// b) are part of a cf that was dropped. Keep in mind that the
+		// cf.name() is suspect. do every thing based on the cfid
+		// instead.
+		RowMutation newRm = null;
+		for (ColumnFamily columnFamily : frm.getColumnFamilies()) {
+			if (Schema.instance.getCF(columnFamily.id()) == null)
+				// null means the cf has been dropped
+				continue;
 
-					ReplayPosition rp = cfPositions.get(columnFamily.id());
+			// replay if current segment is newer than last flushed one
+			// or,
+			// if it is the last known segment, if we are after the
+			// replay position
+			/*
+			 * pgaref We assume that the segment is always NEW!!!! if (segment >
+			 * rp.segment || (segment == rp.segment && entryLocation >
+			 * rp.position)) {
+			 */
+			if (newRm == null)
+				newRm = new RowMutation(frm.getKeyspaceName(), frm.key());
+			newRm.add(columnFamily);
+			replayedCount.incrementAndGet();
 
-					// replay if current segment is newer than last flushed one
-					// or,
-					// if it is the last known segment, if we are after the
-					// replay position
-					/*
-					 * pgaref We assume that the segment is always NEW!!!! if
-					 * (segment > rp.segment || (segment == rp.segment &&
-					 * entryLocation > rp.position)) {
-					 */
-					if (newRm == null)
-						newRm = new RowMutation(frm.getKeyspaceName(),
-								frm.key());
-					newRm.add(columnFamily);
-					replayedCount.incrementAndGet();
-
-				}
-				if (newRm != null) {
-					assert !newRm.isEmpty();
-					Keyspace.open(newRm.getKeyspaceName()).apply(newRm, false);
-					keyspacesRecovered.add(keyspace);
-					KSMetaData ksm = Schema.instance.getKSMetaData(keyspace.getName());
-					try {
-						MigrationManager.announceNewKeyspace(ksm);
-					} catch (ConfigurationException e) {
-						Log.info("pgarer -FAILED TO ANNOUCE NEW SCHEMA");
-					}
-				}
-			}
-		};
-		futures.add(StageManager.getStage(Stage.MUTATION).submit(runnable));
-		if (futures.size() > MAX_OUTSTANDING_REPLAY_COUNT) {
-			FBUtilities.waitOnFutures(futures);
-			futures.clear();
+		}
+		if (newRm != null) {
+			assert !newRm.isEmpty();
+			Keyspace.open(newRm.getKeyspaceName()).apply(newRm, false, true);
+			keyspacesRecovered.add(keyspace);
+			/*
+			 * KSMetaData ksm =
+			 * Schema.instance.getKSMetaData(keyspace.getName()); try {
+			 * MigrationManager.announceNewKeyspace(ksm); } catch
+			 * (ConfigurationException e) {
+			 * Log.info("pgarer -FAILED TO ANNOUCE NEW SCHEMA"); }
+			 */
 		}
 
 	}

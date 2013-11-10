@@ -27,9 +27,10 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
+
+import org.mortbay.log.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.apache.cassandra.config.CFMetaData;
 import org.apache.cassandra.config.DatabaseDescriptor;
 import org.apache.cassandra.config.KSMetaData;
@@ -350,6 +351,7 @@ public class Keyspace
     {
         // write the mutation to the commitlog and memtables
         Tracing.trace("Acquiring switchLock read lock");
+        Log.info("pgaref -Acquiring switchLock read lock" );
         switchLock.readLock().lock();
         try
         {
@@ -370,6 +372,7 @@ public class Keyspace
                 }
 
                 Tracing.trace("Adding to {} memtable", cf.metadata().cfName);
+                Log.info("pgaref - Adding to {} memtable", cf.metadata().cfName);
                 cfs.apply(key, cf, updateIndexes ? cfs.indexManager.updaterFor(key, cf) : SecondaryIndexManager.nullUpdater);
             }
         }
