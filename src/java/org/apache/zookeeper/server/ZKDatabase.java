@@ -330,30 +330,30 @@ public class ZKDatabase {
 
 					CommitLog.instance.add(tmp);
 					Keyspace keyspace = Keyspace.open(tmp.getKeyspaceName());
-					//Jesus Christ
-					for (ColumnFamily columnFamily : tmp.getColumnFamilies())
-                    {
-						Schema.instance.storeKeyspaceInstance(keyspace);
-						Collection<UUID> cl = tmp.getColumnFamilyIds();
-						for(UUID id : cl){
-						
-							ColumnFamilyStore store = keyspace.getColumnFamilyStore(id);
+					// Jesus Christ
+					// Schema.instance.storeKeyspaceInstance(keyspace);
+					Collection<UUID> cl = tmp.getColumnFamilyIds();
+					for (UUID id : cl) {
 
-							LOG.info("pgaref - Mpika!!! UUID: " + id.toString());
-							TreeMapBackedSortedColumns.factory.create(tmp.getKeyspaceName(), store.name);
-							tmp.apply();
-						
-						}
-                    }
-					
-					if (tmp != null)
-                    {
-                    	LOG.info("pgaref - final case RM: "+ tmp.getKeyspaceName() );
-                        assert !tmp.isEmpty();
-                        Keyspace.open(tmp.getKeyspaceName()).apply(tmp, true, true);
-                        keyspace.flush();
-                        tmp.apply();
-                    }
+						ColumnFamilyStore store = keyspace
+								.getColumnFamilyStore(id);
+
+						LOG.info("pgaref - Mpika!!! UUID: " + id.toString());
+						TreeMapBackedSortedColumns.factory.create(
+								tmp.getKeyspaceName(), store.name);
+						tmp.apply();
+
+					}
+
+					if (tmp != null) {
+						LOG.info("pgaref - final case RM: "
+								+ tmp.getKeyspaceName());
+						assert !tmp.isEmpty();
+						Keyspace.open(tmp.getKeyspaceName()).apply(tmp, true,
+								true);
+						keyspace.flush();
+						tmp.apply();
+					}
 					/*
 					final RowMutation frm = tmp;
 				//	final List<Future<?>> futures = new ArrayList<Future<?>>();
