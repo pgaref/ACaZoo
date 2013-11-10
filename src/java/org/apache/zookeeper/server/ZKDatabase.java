@@ -37,6 +37,8 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
+import org.apache.cassandra.concurrent.Stage;
+import org.apache.cassandra.concurrent.StageManager;
 import org.apache.cassandra.config.Schema;
 import org.apache.cassandra.db.ColumnFamily;
 import org.apache.cassandra.db.Keyspace;
@@ -304,7 +306,7 @@ public class ZKDatabase {
 					LOG.info("De - Serialization Error");
 				}
 				LOG.info("------------------------> pgaref FINALLY GOT -> "
-						+ new String(((CreateTxn) txn).getData()));
+					);//	+ new String(((CreateTxn) txn).getData()));
 				// Deserialize and....
 				ByteArrayInputStream bInput = new ByteArrayInputStream(
 						((CreateTxn) txn).getData());
@@ -312,7 +314,7 @@ public class ZKDatabase {
 				try {
 					RowMutation tmp = RowMutation.serializer.deserialize(in,
 							getVersion());
-					System.out.println("pgaref >>>>>> ROW : "+ tmp.toString());
+				//	System.out.println("pgaref >>>>>> ROW : "+ tmp.toString());
 					CommitLog.instance.add(tmp);
 					//Jesus Christ
 					
@@ -351,12 +353,13 @@ public class ZKDatabase {
 	                        }
 	                        if (newRm != null)
 	                        {
+	                        	LOG.info("pgaref - final case RM: "+ frm.getKeyspaceName() );
 	                            assert !newRm.isEmpty();
 	                            Keyspace.open(newRm.getKeyspaceName()).apply(newRm, false);
 	                        }
 	                    }
 	                };
-					
+	                StageManager.getStage(Stage.MUTATION).submit(runnable);
 					
 				} catch (IOException e) {
 					LOG.error("pgaref - Deserialization FAILED!");
