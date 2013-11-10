@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -33,6 +34,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Future;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
@@ -47,6 +49,7 @@ import org.apache.cassandra.db.commitlog.CommitLog;
 import org.apache.cassandra.db.commitlog.ReplayPosition;
 import org.apache.cassandra.net.MessagingService;
 import org.apache.cassandra.service.CassandraDaemon;
+import org.apache.cassandra.utils.FBUtilities;
 import org.apache.cassandra.utils.WrappedRunnable;
 import org.apache.jute.BinaryOutputArchive;
 import org.apache.jute.InputArchive;
@@ -319,14 +322,15 @@ public class ZKDatabase {
 					//Jesus Christ
 					
 					final RowMutation frm = tmp;
+					final List<Future<?>> futures = new ArrayList<Future<?>>();
 	                Runnable runnable = new WrappedRunnable()
 	                {
 	                    public void runMayThrow() throws IOException
 	                    {
 	                        if (Schema.instance.getKSMetaData(frm.getKeyspaceName()) == null){
 	                        	LOG.info("pgaref - Creating keyspace "+ frm.getKeyspaceName() );
-	                        	Keyspace tmp = Keyspace.openWithoutSSTables(frm.getKeyspaceName());
-	                        	Schema.instance.storeKeyspaceInstance(tmp);
+	                        	//Keyspace tmp = Keyspace.openWithoutSSTables(frm.getKeyspaceName());
+	                        	//Schema.instance.storeKeyspaceInstance(tmp);
 	                        	return;
 	                        }
 	                            
@@ -355,13 +359,12 @@ public class ZKDatabase {
 	                        {
 	                        	LOG.info("pgaref - final case RM: "+ frm.getKeyspaceName() );
 	                            assert !newRm.isEmpty();
-	                            Keyspace tmp = Keyspace.openWithoutSSTables(frm.getKeyspaceName());
-	                        	Schema.instance.storeKeyspaceInstance(tmp);
-	                           // Keyspace.open(newRm.getKeyspaceName()).apply(newRm, false);
+	                            Keyspace.open(newRm.getKeyspaceName()).apply(newRm, false);
+	                            futures.addAll(keyspace.flush());
 	                        }
 	                    }
 	                };
-	                StageManager.getStage(Stage.MUTATION).submit(runnable);
+	                futures.add(StageManager.getStage(Stage.MUTATION).submit(runnable));
 					
 				} catch (IOException e) {
 					LOG.error("pgaref - Deserialization FAILED!");
