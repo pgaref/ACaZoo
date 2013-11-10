@@ -367,6 +367,7 @@ public class ZKDatabase {
 	                            Keyspace.open(newRm.getKeyspaceName()).apply(newRm, false, true);
 	                            Keyspace.openWithoutSSTables(newRm.getKeyspaceName());
 	                            keyspacesRecovered.add(keyspace);
+	                            newRm.apply();
 	                        }
 	                    }
 	                };
