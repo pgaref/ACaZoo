@@ -330,7 +330,6 @@ public class ZKDatabase {
 					
 					final RowMutation frm = tmp;
 					final List<Future<?>> futures = new ArrayList<Future<?>>();
-					final Set<Keyspace> keyspacesRecovered = new NonBlockingHashSet<Keyspace>();
 	                Runnable runnable = new WrappedRunnable()
 	                {
 	                    public void runMayThrow() throws IOException
@@ -366,8 +365,7 @@ public class ZKDatabase {
 	                            assert !newRm.isEmpty();
 	                            Keyspace.open(newRm.getKeyspaceName()).apply(newRm, false, true);
 	                            Keyspace.openWithoutSSTables(newRm.getKeyspaceName());
-	                            keyspacesRecovered.add(keyspace);
-	                            newRm.apply();
+	                            futures.addAll(keyspace.flush());
 	                        }
 	                    }
 	                };
@@ -376,9 +374,6 @@ public class ZKDatabase {
 	                //This is MADNESS
 	                LOG.info("pgaref - THIS IS FUCKING MADNESS!!!!");
 
-	                // flush replayed keyspaces
-	                for (Keyspace keyspace : keyspacesRecovered)
-	                    futures.addAll(keyspace.flush());
 	                
 	             //   CommitLog.instance.resetUnsafe();
 	              //  CommitLog.instance.sync();
