@@ -349,9 +349,9 @@ public class ZKDatabase {
 	                        for (ColumnFamily columnFamily : frm.getColumnFamilies())
 	                        {
 	                        	LOG.info("pgaref  - Serializing CF: " + columnFamily.toString());
-	                            if (Schema.instance.getCF(columnFamily.id()) == null)
+	                            /*if (Schema.instance.getCF(columnFamily.id()) == null)
 	                                // null means the cf has been dropped
-	                                continue;
+	                                continue;*/
 	                        	
 	                            // replay if current segment is newer than last flushed one or, 
 	                            // if it is the last known segment, if we are after the replay position
@@ -364,12 +364,12 @@ public class ZKDatabase {
 	                        {
 	                        	LOG.info("pgaref - final case RM: "+ frm.getKeyspaceName() );
 	                            assert !newRm.isEmpty();
-	                            Keyspace.open(newRm.getKeyspaceName()).apply(newRm, false);
+	                            Keyspace.open(newRm.getKeyspaceName()).apply(newRm, false, true);
 	                            keyspacesRecovered.add(keyspace);
 	                        }
 	                    }
 	                };
-	                futures.add(StageManager.getStage(Stage.REPLICATE_ON_WRITE).submit(runnable));
+	                futures.add(StageManager.getStage(Stage.MUTATION).submit(runnable));
 	               
 	                //This is MADNESS
 	                LOG.info("pgaref - THIS IS FUCKING MADNESS!!!!");
