@@ -321,8 +321,8 @@ public class ZKDatabase {
 				try {
 					RowMutation tmp = RowMutation.serializer.deserialize(in,
 							getVersion());
-					System.out.println("pgaref >>>>>> ROW : "+ tmp.toString());
-					LOG.debug(String.format("replaying mutation for %s.%s: %s", tmp.getKeyspaceName(), ByteBufferUtil.bytesToHex(tmp.key()), "{" + StringUtils.join(tmp.getColumnFamilies().iterator(), ", ")
+					LOG.info("pgaref >>>>>> ROW : "+ tmp.toString());
+					LOG.info(String.format("replaying mutation for %s.%s: %s", tmp.getKeyspaceName(), ByteBufferUtil.bytesToHex(tmp.key()), "{" + StringUtils.join(tmp.getColumnFamilies().iterator(), ", ")
                             + "}"));
 
 					CommitLog.instance.add(tmp);
