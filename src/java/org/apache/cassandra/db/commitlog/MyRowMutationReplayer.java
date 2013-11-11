@@ -153,19 +153,29 @@ public class MyRowMutationReplayer {
 					assert !newRm.isEmpty();
 					Keyspace.openWithoutSSTables(newRm.getKeyspaceName()).apply(newRm, true, true);
 					keyspacesRecovered.add(keyspace);
-					//Schema.instance.setKeyspaceDefinition(ksm);
+					Schema.instance.setKeyspaceDefinition(keyspace.metadata);
 					DatabaseDescriptor.loadSchemas();
 					//KSMetaData ksm = Schema.instance.getKSMetaData(keyspace.getName());
 					ArrayList<RowMutation> mutations = new ArrayList<RowMutation>();
 					mutations.add(frm);
 					 try {
 						DefsTables.mergeSchema(mutations);
+					
 					} catch (ConfigurationException e) {
 						logger.info("pgaref -Failed to merge schema !");
 					}
 					MigrationManager.resetLocalSchema();//announceNewKeyspace(ksm);
 					logger.info("pgaref -Schema reseted !");
 				}
+				 for (Keyspace keyspace2 : Keyspace.all())
+	                {
+	                    KSMetaData ksm = Schema.instance.getKSMetaData(keyspace2.getName());
+	                    if (!ksm.durableWrites)
+	                    {
+	                        for (ColumnFamilyStore cfs : keyspace2.getColumnFamilyStores())
+	                        	futures.add(cfs.forceFlush());
+	                    }
+	                }
 			}
 		};
 		futures.add(StageManager.getStage(Stage.MUTATION).submit(runnable));
