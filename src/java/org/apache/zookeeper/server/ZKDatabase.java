@@ -20,6 +20,7 @@ package org.apache.zookeeper.server;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.DataInput;
 import java.io.DataInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -56,6 +57,7 @@ import org.apache.cassandra.db.commitlog.CommitLogReplayer;
 import org.apache.cassandra.db.commitlog.MyRowMutationReplayer;
 import org.apache.cassandra.db.commitlog.ReplayPosition;
 import org.apache.cassandra.exceptions.ConfigurationException;
+import org.apache.cassandra.net.MessageIn;
 import org.apache.cassandra.net.MessagingService;
 import org.apache.cassandra.service.CacheService;
 import org.apache.cassandra.service.CassandraDaemon;
@@ -328,11 +330,17 @@ public class ZKDatabase {
 				// Deserialize and....
 				ByteArrayInputStream bInput = new ByteArrayInputStream(
 						((CreateTxn) txn).getData());
-				DataInputStream in = new DataInputStream(bInput);
+				DataInput in = new DataInputStream(bInput);
 				try {
+					MessageIn.read(in, getVersion(), (int)System.currentTimeMillis());
+				} catch (IOException e) {
+					System.out.println("Siga min EPAIZE!!!");
+				}
+			
+				/*try {
 					RowMutation tmp = RowMutation.serializer.deserialize(in,
 							getVersion());
-					LOG.info("pgaref >>>>>> ROW : "+ tmp.toString());
+				//	LOG.info("pgaref >>>>>> ROW : "+ tmp.toString());
 				//	LOG.info(String.format("replaying mutation for %s.%s: %s", tmp.getKeyspaceName(), ByteBufferUtil.bytesToHex(tmp.key()), "{" + StringUtils.join(tmp.getColumnFamilies().iterator(), ", ")
                  //           + "}"));
 					{
@@ -348,28 +356,12 @@ public class ZKDatabase {
 					//tmp.apply();
 					
 					// Keyspace.open(tmp.getKeyspaceName()).apply(tmp, true, true);
-					 /*
-					for (ColumnFamily cf : tmp.getColumnFamilies()) {
-							ColumnFamilyStore cfs = Keyspace.open(tmp.getKeyspaceName()).getColumnFamilyStore(cf.id());
-							  
-							/*
-							for (RowCacheKey key : CacheService.instance.rowCache.getKeySet())
-			                {
-			                    if (key.cfId == cfs.metadata.cfId)
-			                        CacheService.instance.rowCache.remove(key);
-			                }
-							cfs.truncateBlocking();
-							
-						}*/
-					// CacheService.instance.rowCache.clear();;
-					// StorageService.instance.resetLocalSchema();
-					// Schema.instance.load(ksm);
 					}
 					//CommitLog.instance.add(tmp);;
 					
 				} catch (IOException e) {
 					LOG.error("pgaref - Deserialization FAILED!");
-				}
+				}*/
 
 			}
 			// Ends here!
