@@ -275,7 +275,7 @@ public class MigrationManager implements IEndpointStateChangeSubscriber
      * actively announce a new version to active hosts via rpc
      * @param schema The schema mutation to be applied
      */
-    private static void announce(RowMutation schema)
+    public static void announce(RowMutation schema)
     {
         FBUtilities.waitOnFuture(announce(Collections.singletonList(schema)));
     }

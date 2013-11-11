@@ -28,6 +28,7 @@ import java.io.PrintWriter;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -58,6 +59,7 @@ import org.apache.cassandra.exceptions.ConfigurationException;
 import org.apache.cassandra.net.MessagingService;
 import org.apache.cassandra.service.CacheService;
 import org.apache.cassandra.service.CassandraDaemon;
+import org.apache.cassandra.service.MigrationManager;
 import org.apache.cassandra.service.StorageService;
 import org.apache.cassandra.utils.ByteBufferUtil;
 import org.apache.cassandra.utils.FBUtilities;
@@ -353,9 +355,9 @@ public class ZKDatabase {
 							cfs.truncateBlocking();
 							
 						}*/
-					 CacheService.instance.rowCache.clear();;
-					 StorageService.instance.resetLocalSchema();
-					
+					// CacheService.instance.rowCache.clear();;
+					// StorageService.instance.resetLocalSchema();
+					 MigrationManager.announce(tmp);
 					}
 					//CommitLog.instance.add(tmp);;
 					
