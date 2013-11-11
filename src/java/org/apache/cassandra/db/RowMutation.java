@@ -200,10 +200,12 @@ public class RowMutation implements IMutation
     {
         Keyspace ks = Keyspace.open(keyspaceName);
         ks.apply(this, ks.metadata.durableWrites);
-        
+        System.out.println("pgaref: Meta: "+ ks.metadata);
+        System.out.println("pgaref:  KS "+ ks.getName());
         for (ColumnFamily cf_ : this.getColumnFamilies())
         {
             ColumnFamily cf = cf_.cloneMeShallow();
+            System.out.println("pgaref - this thing is about : " + cf.id());
             ColumnFamilyStore cfs = ks.getColumnFamilyStore(cf.id());
             for (Column column : cf_)
             {
