@@ -358,7 +358,7 @@ public class DefsTables
     private static void updateKeyspace(KSMetaData newState)
     {
         KSMetaData oldKsm = Schema.instance.getKSMetaData(newState.name);
-        assert oldKsm != null;
+        //assert oldKsm != null;
         KSMetaData newKsm = KSMetaData.cloneWith(oldKsm.reloadAttributes(), oldKsm.cfMetaData().values());
 
         Schema.instance.setKeyspaceDefinition(newKsm);
