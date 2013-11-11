@@ -225,12 +225,10 @@ public class RowMutation implements IMutation
         {
             // It's slighty faster to assume the key wasn't present and fix if
             // not in the case where it wasn't there indeed.
-			if (entry.getValue() != null) {
-				ColumnFamily cf = this.modifications.put(entry.getKey(),
-						entry.getValue());
+				ColumnFamily cf = this.modifications.get(entry.getKey());
 				if (cf != null)
 					entry.getValue().resolve(cf);
-			}
+			
         }
     }
 
