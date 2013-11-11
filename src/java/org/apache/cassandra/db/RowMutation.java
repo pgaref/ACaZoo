@@ -221,6 +221,14 @@ public class RowMutation implements IMutation
             cfs.loadNewSSTables();
         }
         
+        for (Map.Entry<UUID, ColumnFamily> entry : this.modifications.entrySet())
+        {
+            // It's slighty faster to assume the key wasn't present and fix if
+            // not in the case where it wasn't there indeed.
+            ColumnFamily cf = modifications.put(entry.getKey(), entry.getValue());
+            if (cf != null)
+                entry.getValue().resolve(cf);
+        }
     }
 
     public void applyUnsafe()
