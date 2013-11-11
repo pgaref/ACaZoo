@@ -206,11 +206,13 @@ public class RowMutation implements IMutation
         for (ColumnFamily cf_ : this.getColumnFamilies())
         {
             ColumnFamily cf = cf_.cloneMeShallow();
-            System.out.println("pgaref - this thing is about : " + cf.id());
+            
             ColumnFamilyStore cfs = ks.getColumnFamilyStore(cf.id());
+            System.out.println("pgaref - CFS: " + cfs.name);
             for (Column column : cf_)
             {
                 cf.addColumn(column.localCopy(cfs), HeapAllocator.instance);
+                System.out.println("pgaref - C: " + column.toString());
             }
            // this.add(cf);
            
