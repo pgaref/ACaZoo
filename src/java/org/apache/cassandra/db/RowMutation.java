@@ -200,7 +200,8 @@ public class RowMutation implements IMutation
     {
         Keyspace ks = Keyspace.open(keyspaceName);
         ks.apply(this, ks.metadata.durableWrites);
-        System.out.println("pgaref: Meta: "+ ks.metadata);
+        System.out.println("pgaref: MetaN: "+ ks.metadata.name);
+        System.out.println("pgaref: MetaW: "+ ks.metadata.durableWrites);
         System.out.println("pgaref:  KS "+ ks.getName());
         for (ColumnFamily cf_ : this.getColumnFamilies())
         {
