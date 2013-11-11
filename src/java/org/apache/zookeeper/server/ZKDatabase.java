@@ -338,7 +338,7 @@ public class ZKDatabase {
 					//tmp.apply();
 					
 					 Keyspace.open(tmp.getKeyspaceName()).apply(tmp, false, false);
-					 Schema.instance.clear();
+					 StorageService.instance.resetLocalSchema();
 					
 					}
 					//CommitLog.instance.add(tmp);;
