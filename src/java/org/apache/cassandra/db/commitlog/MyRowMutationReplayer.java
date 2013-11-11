@@ -9,6 +9,7 @@ package org.apache.cassandra.db.commitlog;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,6 +24,7 @@ import org.apache.cassandra.config.KSMetaData;
 import org.apache.cassandra.config.Schema;
 import org.apache.cassandra.db.ColumnFamily;
 import org.apache.cassandra.db.ColumnFamilyStore;
+import org.apache.cassandra.db.DefsTables;
 import org.apache.cassandra.db.Keyspace;
 import org.apache.cassandra.db.RowMutation;
 import org.apache.cassandra.db.SystemKeyspace;
@@ -148,10 +150,17 @@ public class MyRowMutationReplayer {
 				}
 				if (newRm != null) {
 					assert !newRm.isEmpty();
-					Keyspace.open(newRm.getKeyspaceName()).apply(newRm, false, true);
+					Keyspace.open(newRm.getKeyspaceName()).apply(newRm, true, true);
 					keyspacesRecovered.add(keyspace);
 					
 					//KSMetaData ksm = Schema.instance.getKSMetaData(keyspace.getName());
+					ArrayList<RowMutation> mutations = new ArrayList<RowMutation>();
+					mutations.add(frm);
+					 try {
+						DefsTables.mergeSchema(mutations);
+					} catch (ConfigurationException e) {
+						logger.info("pgaref -Failed to merge schema !");
+					}
 					MigrationManager.resetLocalSchema();//announceNewKeyspace(ksm);
 					logger.info("pgaref -Schema reseted !");
 				}
