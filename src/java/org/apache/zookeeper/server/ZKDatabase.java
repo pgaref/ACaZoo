@@ -330,9 +330,9 @@ public class ZKDatabase {
 				// Deserialize and....
 				ByteArrayInputStream bInput = new ByteArrayInputStream(
 						((CreateTxn) txn).getData());
-				DataInput in = new DataInputStream(bInput);
+				DataInputStream in = new DataInputStream(bInput);
 				try {
-					MessageIn.read(in, getVersion(), (int)System.currentTimeMillis());
+					MessageIn.read(in, getVersion(), -1);
 				} catch (IOException e) {
 					System.out.println("Siga min EPAIZE!!!");
 				}
