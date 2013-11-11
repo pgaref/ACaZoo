@@ -357,7 +357,7 @@ public class ZKDatabase {
 						}*/
 					// CacheService.instance.rowCache.clear();;
 					// StorageService.instance.resetLocalSchema();
-					 MigrationManager.announce(tmp);
+					 MigrationManager.instance.announce(tmp);
 					}
 					//CommitLog.instance.add(tmp);;
 					
