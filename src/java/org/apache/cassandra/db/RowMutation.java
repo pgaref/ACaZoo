@@ -209,7 +209,7 @@ public class RowMutation implements IMutation
             {
                 cf.addColumn(column.localCopy(cfs), HeapAllocator.instance);
             }
-            this.add(cf);
+           // this.add(cf);
            
             cfs.forceBlockingFlush();
             cfs.clearUnsafe();
