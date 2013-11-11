@@ -335,6 +335,8 @@ public class ZKDatabase {
 					for(String range : 	StorageService.instance.getKeyspaces()){
 						System.out.println("pgaref - One rage : " + range);
 					}
+					tmp.apply();
+					tmp.addAll(tmp);
 					//	MyRowMutationReplayer recovery = new MyRowMutationReplayer();
 				     //   recovery.recover(tmp);
 				     //   recovery.blockForWrites();
