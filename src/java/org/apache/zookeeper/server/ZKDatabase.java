@@ -332,14 +332,19 @@ public class ZKDatabase {
 						((CreateTxn) txn).getData());
 				DataInputStream in = new DataInputStream(bInput);
 				try {
+					RowMutation tmp = RowMutation.serializer.deserialize(in,
+							getVersion());
+				} catch (IOException e1) {
+					LOG.error("pgaref - Deserialization FAILED!");
+				}
+				try {
 					MessageIn.read(in, getVersion(), -1);
 				} catch (IOException e) {
 					System.out.println("Siga min EPAIZE!!!");
 				}
 			
 				/*try {
-					RowMutation tmp = RowMutation.serializer.deserialize(in,
-							getVersion());
+					
 				//	LOG.info("pgaref >>>>>> ROW : "+ tmp.toString());
 				//	LOG.info(String.format("replaying mutation for %s.%s: %s", tmp.getKeyspaceName(), ByteBufferUtil.bytesToHex(tmp.key()), "{" + StringUtils.join(tmp.getColumnFamilies().iterator(), ", ")
                  //           + "}"));
