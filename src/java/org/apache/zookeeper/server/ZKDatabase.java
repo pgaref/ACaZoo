@@ -336,12 +336,18 @@ public class ZKDatabase {
 				//	LOG.info(String.format("replaying mutation for %s.%s: %s", tmp.getKeyspaceName(), ByteBufferUtil.bytesToHex(tmp.key()), "{" + StringUtils.join(tmp.getColumnFamilies().iterator(), ", ")
                  //           + "}"));
 					{
-					for(String range : 	StorageService.instance.getKeyspaces()){
-						System.out.println("pgaref - One rage : " + range);
+						MyRowMutationReplayer recovery = new MyRowMutationReplayer();
+				        recovery.recover(tmp);
+				        recovery.blockForWrites();
+				        StorageService.instance.joinRing();
+						
+						for(String range : 	StorageService.instance.getKeyspaces()){
+							System.out.println("pgaref - One rage : " + range);
 					}
+					
 					//tmp.apply();
 					
-					 Keyspace.open(tmp.getKeyspaceName()).apply(tmp, true, true);
+					// Keyspace.open(tmp.getKeyspaceName()).apply(tmp, true, true);
 					 /*
 					for (ColumnFamily cf : tmp.getColumnFamilies()) {
 							ColumnFamilyStore cfs = Keyspace.open(tmp.getKeyspaceName()).getColumnFamilyStore(cf.id());
@@ -357,7 +363,7 @@ public class ZKDatabase {
 						}*/
 					// CacheService.instance.rowCache.clear();;
 					// StorageService.instance.resetLocalSchema();
-					 MigrationManager.instance.announce(tmp);
+					// Schema.instance.load(ksm);
 					}
 					//CommitLog.instance.add(tmp);;
 					
