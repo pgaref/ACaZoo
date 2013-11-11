@@ -41,6 +41,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
+import org.apache.cassandra.cache.RowCacheKey;
 import org.apache.cassandra.concurrent.Stage;
 import org.apache.cassandra.concurrent.StageManager;
 import org.apache.cassandra.config.Schema;
@@ -55,6 +56,7 @@ import org.apache.cassandra.db.commitlog.MyRowMutationReplayer;
 import org.apache.cassandra.db.commitlog.ReplayPosition;
 import org.apache.cassandra.exceptions.ConfigurationException;
 import org.apache.cassandra.net.MessagingService;
+import org.apache.cassandra.service.CacheService;
 import org.apache.cassandra.service.CassandraDaemon;
 import org.apache.cassandra.service.StorageService;
 import org.apache.cassandra.utils.ByteBufferUtil;
@@ -338,6 +340,20 @@ public class ZKDatabase {
 					//tmp.apply();
 					
 					 Keyspace.open(tmp.getKeyspaceName()).apply(tmp, true, true);
+					 /*
+					for (ColumnFamily cf : tmp.getColumnFamilies()) {
+							ColumnFamilyStore cfs = Keyspace.open(tmp.getKeyspaceName()).getColumnFamilyStore(cf.id());
+							  
+							/*
+							for (RowCacheKey key : CacheService.instance.rowCache.getKeySet())
+			                {
+			                    if (key.cfId == cfs.metadata.cfId)
+			                        CacheService.instance.rowCache.remove(key);
+			                }
+							cfs.truncateBlocking();
+							
+						}*/
+					 CacheService.instance.rowCache.clear();;
 					 StorageService.instance.resetLocalSchema();
 					
 					}
