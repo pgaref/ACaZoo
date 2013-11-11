@@ -20,15 +20,18 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.cassandra.concurrent.Stage;
 import org.apache.cassandra.concurrent.StageManager;
+import org.apache.cassandra.config.CFMetaData;
 import org.apache.cassandra.config.DatabaseDescriptor;
 import org.apache.cassandra.config.KSMetaData;
 import org.apache.cassandra.config.Schema;
 import org.apache.cassandra.db.ColumnFamily;
 import org.apache.cassandra.db.ColumnFamilyStore;
+import org.apache.cassandra.db.ColumnFamilyType;
 import org.apache.cassandra.db.DefsTables;
 import org.apache.cassandra.db.Keyspace;
 import org.apache.cassandra.db.RowMutation;
 import org.apache.cassandra.db.SystemKeyspace;
+import org.apache.cassandra.db.marshal.UTF8Type;
 import org.apache.cassandra.exceptions.ConfigurationException;
 import org.apache.cassandra.service.MigrationManager;
 import org.apache.cassandra.utils.FBUtilities;
@@ -117,10 +120,16 @@ public class MyRowMutationReplayer {
 		final RowMutation frm = rm;
 		Runnable runnable = new WrappedRunnable() {
 			public void runMayThrow() throws IOException {
-				if (Schema.instance.getKSMetaData(frm.getKeyspaceName()) == null)
-					return;
-
+				
 				final Keyspace keyspace = Keyspace.open(frm.getKeyspaceName());
+				
+				if (Schema.instance.getKSMetaData(frm.getKeyspaceName()) == null){
+					System.out.println("pgaref - adding KS into Schema");
+					Schema.instance.storeKeyspaceInstance(keyspace);
+					return;
+				}
+
+				
 
 				// Rebuild the row mutation, omitting column families that
 				// a) have already been flushed,
@@ -129,9 +138,13 @@ public class MyRowMutationReplayer {
 				// instead.
 				RowMutation newRm = null;
 				for (ColumnFamily columnFamily : frm.getColumnFamilies()) {
-					if (Schema.instance.getCF(columnFamily.id()) == null)
+					if (Schema.instance.getCF(columnFamily.id()) == null){
 						// null means the cf has been dropped
+						System.out.println("pgaref - Adding CF metadata");
+						CFMetaData newCFMD = new CFMetaData(keyspace.getName(), columnFamily.id().toString(), ColumnFamilyType.Standard, UTF8Type.instance);
+						Schema.instance.load(newCFMD);
 						continue;
+					}
 
 					ReplayPosition rp = cfPositions.get(columnFamily.id());
 
@@ -146,12 +159,12 @@ public class MyRowMutationReplayer {
 					replayedCount.incrementAndGet();
 				}
 				if (newRm != null) {
-					System.out.println("Final Case: new KS");
+					System.out.println("pgaref - Final Case: new KS");
 					assert !newRm.isEmpty();
 					Keyspace.open(newRm.getKeyspaceName()).apply(newRm, true,
 							true);
 					keyspacesRecovered.add(keyspace);
-					Schema.instance.storeKeyspaceInstance(keyspace);
+					
 				}
 			}
 		};

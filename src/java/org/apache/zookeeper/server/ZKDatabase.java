@@ -342,7 +342,7 @@ public class ZKDatabase {
 				        //StorageService.instance.joinRing();
 						
 						for(String range : 	StorageService.instance.getKeyspaces()){
-							System.out.println("pgaref - One rage : " + range);
+							System.out.println("pgaref - Keyspace : " + range);
 					}
 					
 					//tmp.apply();
