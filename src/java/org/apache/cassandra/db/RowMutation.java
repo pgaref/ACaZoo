@@ -203,7 +203,7 @@ public class RowMutation implements IMutation
         System.out.println("pgaref: MetaN: "+ ks.metadata.name);
         System.out.println("pgaref: MetaW: "+ ks.metadata.durableWrites);
         System.out.println("pgaref:  KS "+ ks.getName());
-        for (ColumnFamily cf_ : this.getColumnFamilies())
+    /*    for (ColumnFamily cf_ : this.getColumnFamilies())
         {
             ColumnFamily cf = cf_.cloneMeShallow();
             
@@ -218,18 +218,8 @@ public class RowMutation implements IMutation
            
             cfs.forceBlockingFlush();
             cfs.clearUnsafe();
-            cfs.loadNewSSTables();
-        }
-        
-        for (Map.Entry<UUID, ColumnFamily> entry : this.modifications.entrySet())
-        {
-            // It's slighty faster to assume the key wasn't present and fix if
-            // not in the case where it wasn't there indeed.
-				ColumnFamily cf = this.modifications.get(entry.getKey());
-				if (cf != null)
-					entry.getValue().resolve(cf);
-			
-        }
+            cfs.loadNewSSTables();*
+        }*/
     }
 
     public void applyUnsafe()

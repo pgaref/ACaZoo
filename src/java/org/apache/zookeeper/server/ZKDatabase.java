@@ -335,26 +335,13 @@ public class ZKDatabase {
 					for(String range : 	StorageService.instance.getKeyspaces()){
 						System.out.println("pgaref - One rage : " + range);
 					}
-					tmp.apply();
+					//tmp.apply();
+					
+					 Keyspace.open(tmp.getKeyspaceName()).apply(tmp, false, false);
 					
 					
-					
-					/*
-					for (Map.Entry<UUID, ColumnFamily> entry : tmp.modifications.entrySet())
-			        {
-			            // It's slighty faster to assume the key wasn't present and fix if
-			            // not in the case where it wasn't there indeed.
-						// PANOS STOPPED HERE!
-			            ColumnFamily cf = tmp.modifications.put(entry.getKey(), entry.getValue());
-			            if (cf != null)
-			                entry.getValue().resolve(cf);
-			        }
-					//	MyRowMutationReplayer recovery = new MyRowMutationReplayer();
-				     //   recovery.recover(tmp);
-				     //   recovery.blockForWrites();
-						*/
 					}
-					CommitLog.instance.add(tmp);;
+					//CommitLog.instance.add(tmp);;
 					
 				} catch (IOException e) {
 					LOG.error("pgaref - Deserialization FAILED!");
