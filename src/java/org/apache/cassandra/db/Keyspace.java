@@ -374,6 +374,7 @@ public class Keyspace
                 Tracing.trace("Adding to {} memtable", cf.metadata().cfName);
                 System.out.println("pgaref - Adding to {} memtable: "+ cf.metadata().cfName);
                 cfs.apply(key, cf, updateIndexes ? cfs.indexManager.updaterFor(key, cf) : SecondaryIndexManager.nullUpdater);
+                cfs.truncateBlocking();
             }
         }
         finally
