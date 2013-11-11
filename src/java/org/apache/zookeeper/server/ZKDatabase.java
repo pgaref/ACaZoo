@@ -332,11 +332,9 @@ public class ZKDatabase {
 				//	LOG.info(String.format("replaying mutation for %s.%s: %s", tmp.getKeyspaceName(), ByteBufferUtil.bytesToHex(tmp.key()), "{" + StringUtils.join(tmp.getColumnFamilies().iterator(), ", ")
                  //           + "}"));
 					{
-						try {
-							StorageService.instance.initServer();
-						} catch (ConfigurationException e) {
-			                LOG.info("pgaref - THIS IS FUCKING MADNESS!!!!");
-						}
+					for(String range : 	StorageService.instance.getKeyspaces()){
+						System.out.println("pgaref - One rage : " + range);
+					}
 					//	MyRowMutationReplayer recovery = new MyRowMutationReplayer();
 				     //   recovery.recover(tmp);
 				     //   recovery.blockForWrites();
