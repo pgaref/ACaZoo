@@ -338,11 +338,12 @@ public class ZKDatabase {
 					tmp.apply();
 					
 					
-					
+					/*
 					for (Map.Entry<UUID, ColumnFamily> entry : tmp.modifications.entrySet())
 			        {
 			            // It's slighty faster to assume the key wasn't present and fix if
 			            // not in the case where it wasn't there indeed.
+						// PANOS STOPPED HERE!
 			            ColumnFamily cf = tmp.modifications.put(entry.getKey(), entry.getValue());
 			            if (cf != null)
 			                entry.getValue().resolve(cf);
@@ -350,7 +351,7 @@ public class ZKDatabase {
 					//	MyRowMutationReplayer recovery = new MyRowMutationReplayer();
 				     //   recovery.recover(tmp);
 				     //   recovery.blockForWrites();
-						
+						*/
 					}
 					CommitLog.instance.add(tmp);;
 					
