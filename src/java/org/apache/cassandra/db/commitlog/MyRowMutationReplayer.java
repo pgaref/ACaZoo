@@ -20,6 +20,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.cassandra.concurrent.Stage;
 import org.apache.cassandra.concurrent.StageManager;
+import org.apache.cassandra.config.DatabaseDescriptor;
 import org.apache.cassandra.config.KSMetaData;
 import org.apache.cassandra.config.Schema;
 import org.apache.cassandra.db.ColumnFamily;
@@ -150,9 +151,10 @@ public class MyRowMutationReplayer {
 				}
 				if (newRm != null) {
 					assert !newRm.isEmpty();
-					Keyspace.open(newRm.getKeyspaceName()).apply(newRm, true, true);
+					Keyspace.openWithoutSSTables(newRm.getKeyspaceName()).apply(newRm, true, true);
 					keyspacesRecovered.add(keyspace);
-					
+					//Schema.instance.setKeyspaceDefinition(ksm);
+					DatabaseDescriptor.loadSchemas();
 					//KSMetaData ksm = Schema.instance.getKSMetaData(keyspace.getName());
 					ArrayList<RowMutation> mutations = new ArrayList<RowMutation>();
 					mutations.add(frm);
