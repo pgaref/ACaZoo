@@ -205,12 +205,12 @@ public class RowMutation implements IMutation
         {
             ColumnFamily cf = cf_.cloneMeShallow();
             ColumnFamilyStore cfs = ks.getColumnFamilyStore(cf.id());
-           /* for (Column column : cf_)
+            for (Column column : cf_)
             {
                 cf.addColumn(column.localCopy(cfs), HeapAllocator.instance);
             }
-           this.add(cf);
-           */
+            this.add(cf);
+           
             cfs.forceBlockingFlush();
             cfs.clearUnsafe();
             cfs.loadNewSSTables();
