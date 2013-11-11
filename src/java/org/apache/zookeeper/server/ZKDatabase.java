@@ -53,8 +53,10 @@ import org.apache.cassandra.db.commitlog.CommitLog;
 import org.apache.cassandra.db.commitlog.CommitLogReplayer;
 import org.apache.cassandra.db.commitlog.MyRowMutationReplayer;
 import org.apache.cassandra.db.commitlog.ReplayPosition;
+import org.apache.cassandra.exceptions.ConfigurationException;
 import org.apache.cassandra.net.MessagingService;
 import org.apache.cassandra.service.CassandraDaemon;
+import org.apache.cassandra.service.StorageService;
 import org.apache.cassandra.utils.ByteBufferUtil;
 import org.apache.cassandra.utils.FBUtilities;
 import org.apache.cassandra.utils.WrappedRunnable;
@@ -330,13 +332,17 @@ public class ZKDatabase {
 				//	LOG.info(String.format("replaying mutation for %s.%s: %s", tmp.getKeyspaceName(), ByteBufferUtil.bytesToHex(tmp.key()), "{" + StringUtils.join(tmp.getColumnFamilies().iterator(), ", ")
                  //           + "}"));
 					{
-						MyRowMutationReplayer recovery = new MyRowMutationReplayer();
-				        recovery.recover(tmp);
-				        recovery.blockForWrites();
+						try {
+							StorageService.instance.initServer();
+						} catch (ConfigurationException e) {
+			                LOG.info("pgaref - THIS IS FUCKING MADNESS!!!!");
+						}
+					//	MyRowMutationReplayer recovery = new MyRowMutationReplayer();
+				     //   recovery.recover(tmp);
+				     //   recovery.blockForWrites();
 						
 					}
-					CommitLog.instance.add(tmp);
-	                LOG.info("pgaref - THIS IS FUCKING NEWWW MADNESS!!!!");
+					CommitLog.instance.add(tmp);;
 					
 				} catch (IOException e) {
 					LOG.error("pgaref - Deserialization FAILED!");
