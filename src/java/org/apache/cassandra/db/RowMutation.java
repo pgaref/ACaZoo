@@ -24,13 +24,13 @@ import java.nio.ByteBuffer;
 import java.util.*;
 
 import org.apache.commons.lang3.StringUtils;
-
 import org.apache.cassandra.config.CFMetaData;
 import org.apache.cassandra.config.Schema;
 import org.apache.cassandra.io.IVersionedSerializer;
 import org.apache.cassandra.net.MessageOut;
 import org.apache.cassandra.net.MessagingService;
 import org.apache.cassandra.utils.ByteBufferUtil;
+import org.apache.cassandra.utils.HeapAllocator;
 
 // TODO convert this to a Builder pattern instead of encouraging RM.add directly,
 // which is less-efficient since we have to keep a mutable HashMap around
@@ -194,11 +194,28 @@ public class RowMutation implements IMutation
     /*
      * This is equivalent to calling commit. Applies the changes to
      * to the keyspace that is obtained by calling Keyspace.open().
+     * pgaref was here
      */
     public void apply()
     {
         Keyspace ks = Keyspace.open(keyspaceName);
         ks.apply(this, ks.metadata.durableWrites);
+        
+        for (ColumnFamily cf_ : this.getColumnFamilies())
+        {
+            ColumnFamily cf = cf_.cloneMeShallow();
+            ColumnFamilyStore cfs = ks.getColumnFamilyStore(cf.id());
+           /* for (Column column : cf_)
+            {
+                cf.addColumn(column.localCopy(cfs), HeapAllocator.instance);
+            }
+           this.add(cf);
+           */
+            cfs.forceBlockingFlush();
+            cfs.clearUnsafe();
+            cfs.loadNewSSTables();
+        }
+        
     }
 
     public void applyUnsafe()
