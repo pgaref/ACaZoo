@@ -21,86 +21,48 @@ package org.apache.zookeeper.server;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.PrintWriter;
-import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
-import org.apache.cassandra.cache.RowCacheKey;
 import org.apache.cassandra.concurrent.Stage;
 import org.apache.cassandra.concurrent.StageManager;
-import org.apache.cassandra.config.CFMetaData;
 import org.apache.cassandra.config.DatabaseDescriptor;
-import org.apache.cassandra.config.KSMetaData;
-import org.apache.cassandra.config.Schema;
-import org.apache.cassandra.db.ColumnFamily;
-import org.apache.cassandra.db.ColumnFamilyStore;
-import org.apache.cassandra.db.Keyspace;
 import org.apache.cassandra.db.RowMutation;
-import org.apache.cassandra.db.SystemKeyspace;
-import org.apache.cassandra.db.TreeMapBackedSortedColumns;
-import org.apache.cassandra.db.commitlog.CommitLog;
-import org.apache.cassandra.db.commitlog.CommitLogReplayer;
-import org.apache.cassandra.db.commitlog.MyRowMutationReplayer;
-import org.apache.cassandra.db.commitlog.ReplayPosition;
-import org.apache.cassandra.exceptions.ConfigurationException;
-import org.apache.cassandra.exceptions.InvalidRequestException;
-import org.apache.cassandra.exceptions.OverloadedException;
-import org.apache.cassandra.exceptions.RequestExecutionException;
-import org.apache.cassandra.exceptions.UnavailableException;
-import org.apache.cassandra.exceptions.WriteTimeoutException;
 import org.apache.cassandra.net.MessagingService;
-import org.apache.cassandra.service.CacheService;
 import org.apache.cassandra.service.CassandraDaemon;
-import org.apache.cassandra.service.MigrationManager;
-import org.apache.cassandra.service.StorageProxy;
 import org.apache.cassandra.service.StorageService;
-import org.apache.cassandra.thrift.ThriftConversion;
-import org.apache.cassandra.utils.ByteBufferUtil;
-import org.apache.cassandra.utils.FBUtilities;
-import org.apache.cassandra.utils.WrappedRunnable;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.jute.BinaryOutputArchive;
 import org.apache.jute.InputArchive;
 import org.apache.jute.OutputArchive;
 import org.apache.jute.Record;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.apache.zookeeper.KeeperException;
 import org.apache.zookeeper.KeeperException.NoNodeException;
 import org.apache.zookeeper.Watcher;
 import org.apache.zookeeper.ZooDefs.OpCode;
 import org.apache.zookeeper.data.ACL;
 import org.apache.zookeeper.data.Stat;
-import org.apache.zookeeper.proto.CreateRequest;
 import org.apache.zookeeper.server.DataTree.ProcessTxnResult;
 import org.apache.zookeeper.server.persistence.FileTxnSnapLog;
 import org.apache.zookeeper.server.persistence.FileTxnSnapLog.PlayBackListener;
 import org.apache.zookeeper.server.quorum.Leader;
-import org.apache.zookeeper.server.quorum.QuorumPeerMain;
 import org.apache.zookeeper.server.quorum.Leader.Proposal;
 import org.apache.zookeeper.server.quorum.QuorumPacket;
 import org.apache.zookeeper.server.util.SerializeUtils;
 import org.apache.zookeeper.txn.CreateTxn;
 import org.apache.zookeeper.txn.TxnHeader;
-import org.cliffc.high_scale_lib.NonBlockingHashSet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class maintains the in memory database of zookeeper
@@ -343,7 +305,7 @@ public class ZKDatabase {
 				DataInputStream in = new DataInputStream(bInput);
 				
 				try {
-					RowMutation tmp = RowMutation.serializer.deserialize(in,
+					final RowMutation tmp = RowMutation.serializer.deserialize(in,
 							getVersion());
 				//	LOG.info("pgaref >>>>>> ROW : "+ tmp.toString());
 				//	LOG.info(String.format("replaying mutation for %s.%s: %s", tmp.getKeyspaceName(), ByteBufferUtil.bytesToHex(tmp.key()), "{" + StringUtils.join(tmp.getColumnFamilies().iterator(), ", ")
@@ -353,20 +315,14 @@ public class ZKDatabase {
 				    //    recovery.recover(tmp);
 				    //    recovery.blockForWrites();
 				        //StorageService.instance.joinRing();
-					tmp.apply();
-				    //tmp.applyUnsafe();
 					
-			        
-			            
-					try {
-						StorageProxy.mutateAtomically(Arrays.asList(tmp), org.apache.cassandra.db.ConsistencyLevel.ONE);
-					} catch (WriteTimeoutException e) {
-						System.out.println("PGAREF - mutateWithTriggers - WriteTimeoutException");
-					} catch (UnavailableException e) {
-						System.out.println("PGAREF - mutateWithTriggers -UnavailableException");
-					} catch (OverloadedException e) {
-						System.out.println("PGAREF - mutateWithTriggers -OverloadedException");
-					}
+					Runnable runnable = new DroppableRunnable(MessagingService.Verb.MUTATION){
+			            public void runMayThrow()
+			            {
+			                tmp.apply();
+			            }
+			        };
+			        StageManager.getStage(Stage.MUTATION).execute(runnable);
 						
 			       
 					
@@ -409,6 +365,42 @@ public class ZKDatabase {
             wl.unlock();
         }
     }
+    
+    
+    /**
+     * A Runnable that aborts if it doesn't start running before it times out
+     */
+    private static abstract class DroppableRunnable implements Runnable
+    {
+        private final long constructionTime = System.nanoTime();
+        private final MessagingService.Verb verb;
+
+        public DroppableRunnable(MessagingService.Verb verb)
+        {
+            this.verb = verb;
+        }
+
+        public final void run()
+        {
+            if (TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - constructionTime) > DatabaseDescriptor.getTimeout(verb))
+            {
+                MessagingService.instance().incrementDroppedMessages(verb);
+                return;
+            }
+
+            try
+            {
+                runMayThrow();
+            }
+            catch (Exception e)
+            {
+                throw new RuntimeException(e);
+            }
+        }
+
+        abstract protected void runMayThrow() throws Exception;
+    }
+    
     protected static final String CUR_VER = System.getProperty("cassandra.version", "2.0");
     protected static final Map<String, Integer> VERSION_MAP = new HashMap<String, Integer> ()
     {{
