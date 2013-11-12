@@ -68,7 +68,7 @@ public class CassandraDaemon
 {
     public static final String MBEAN_NAME = "org.apache.cassandra.db:type=NativeAccess";
     private static final Logger logger = LoggerFactory.getLogger(CassandraDaemon.class);
-    public static ZooEmbedded ZooServer;
+    public static ZooEmbedded ZooServer = null;
     private static String [] ConfDir;
     // Have a dedicated thread to call exit to avoid deadlock in the case where the thread that wants to invoke exit
     // belongs to an executor that our shutdown hook wants to wait to exit gracefully. See CASSANDRA-5273.
