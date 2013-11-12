@@ -34,7 +34,6 @@ import org.apache.cassandra.service.MigrationManager;
 import org.apache.cassandra.tracing.Tracing;
 import org.apache.cassandra.utils.ByteBufferUtil;
 import org.apache.cassandra.utils.Pair;
-import org.apache.tools.ant.types.CommandlineJava.SysProperties;
 import org.cliffc.high_scale_lib.NonBlockingHashMap;
 
 public class Schema

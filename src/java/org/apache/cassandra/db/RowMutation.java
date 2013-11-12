@@ -200,26 +200,24 @@ public class RowMutation implements IMutation
     {
         Keyspace ks = Keyspace.open(keyspaceName);
         ks.apply(this, ks.metadata.durableWrites);
-        System.out.println("pgaref: MetaN: "+ ks.metadata.name);
-        System.out.println("pgaref: MetaW: "+ ks.metadata.durableWrites);
-        System.out.println("pgaref:  KS "+ ks.getName());
-    /*    for (ColumnFamily cf_ : this.getColumnFamilies())
-        {
-            ColumnFamily cf = cf_.cloneMeShallow();
-            
-            ColumnFamilyStore cfs = ks.getColumnFamilyStore(cf.id());
-            System.out.println("pgaref - CFS: " + cfs.name);
-            for (Column column : cf_)
-            {
-                cf.addColumn(column.localCopy(cfs), HeapAllocator.instance);
-                System.out.println("pgaref - C: " + column.toString());
-            }
-           // this.add(cf);
-           
-            cfs.forceBlockingFlush();
-            cfs.clearUnsafe();
-            cfs.loadNewSSTables();*
-        }*/
+        
+		/*
+		 * System.out.println("pgaref: MetaN: "+ ks.metadata.name);
+		 * System.out.println("pgaref: MetaW: "+ ks.metadata.durableWrites);
+		 * System.out.println("pgaref:  KS "+ ks.getName());
+		 * 
+		 * for (ColumnFamily cf_ : this.getColumnFamilies()) { ColumnFamily cf =
+		 * cf_.cloneMeShallow();
+		 * 
+		 * ColumnFamilyStore cfs = ks.getColumnFamilyStore(cf.id());
+		 * System.out.println("pgaref - CFS: " + cfs.name); for (Column column :
+		 * cf_) { cf.addColumn(column.localCopy(cfs), HeapAllocator.instance);
+		 * System.out.println("pgaref - C: " + column.toString()); } //
+		 * this.add(cf);
+		 * 
+		 * cfs.forceBlockingFlush(); cfs.clearUnsafe(); cfs.loadNewSSTables();*
+		 * }
+		 */
     }
 
     public void applyUnsafe()

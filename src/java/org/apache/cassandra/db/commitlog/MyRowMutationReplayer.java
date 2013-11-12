@@ -100,7 +100,7 @@ public class MyRowMutationReplayer {
 					try {
 						DefsTables.mergeSchema(Arrays.asList(frm));
 					} catch (ConfigurationException e) {
-						logger.info("pgaref - Failed to Merge Schem for new RowMutation");
+						logger.error("pgaref - Failed to Merge Schem for new RowMutation");
 					}
 					keyspacesRecovered.add(keyspace);
 				}

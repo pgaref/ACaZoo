@@ -792,7 +792,6 @@ public class ColumnFamilyStore implements ColumnFamilyStoreMBean
      */
     public Future<?> forceFlush()
     {
-    	System.out.println("pgaref - memtable - Clean: "+ isClean() );
         if (isClean())
         {
             // We could have a memtable for this column family that is being

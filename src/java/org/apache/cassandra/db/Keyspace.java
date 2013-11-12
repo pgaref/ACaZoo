@@ -351,7 +351,6 @@ public class Keyspace
     {
         // write the mutation to the commitlog and memtables
         Tracing.trace("Acquiring switchLock read lock");
-        System.out.println("pgaref -Acquiring switchLock read lock" );
         switchLock.readLock().lock();
         try
         {
@@ -372,7 +371,6 @@ public class Keyspace
                 }
 
                 Tracing.trace("Adding to {} memtable", cf.metadata().cfName);
-                System.out.println("pgaref - Adding to {} memtable: "+ cf.metadata().cfName);
                 cfs.apply(key, cf, updateIndexes ? cfs.indexManager.updaterFor(key, cf) : SecondaryIndexManager.nullUpdater);
             }
         }

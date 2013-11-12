@@ -30,20 +30,14 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
-
-import org.apache.cassandra.concurrent.Stage;
-import org.apache.cassandra.concurrent.StageManager;
-import org.apache.cassandra.config.DatabaseDescriptor;
 import org.apache.cassandra.db.RowMutation;
 import org.apache.cassandra.db.commitlog.CommitLog;
 import org.apache.cassandra.db.commitlog.MyRowMutationReplayer;
 import org.apache.cassandra.net.MessagingService;
 import org.apache.cassandra.service.CassandraDaemon;
-import org.apache.cassandra.service.StorageService;
 import org.apache.jute.BinaryOutputArchive;
 import org.apache.jute.InputArchive;
 import org.apache.jute.OutputArchive;
@@ -300,9 +294,9 @@ public class ZKDatabase {
 				try {
 					txn = SerializeUtils.deserializeTxn(pp.getData(), hdr);
 				} catch (IOException e) {
-					LOG.info("De - Serialization Error");
+					LOG.error("De - Serialization Error");
 				}
-				LOG.info("------------------------> pgaref Deserialising..... ");// +
+				LOG.debug("------------------------> pgaref Deserialising..... ");// +
 																					// new
 																					// String(((CreateTxn)
 																					// txn).getData()));
@@ -360,34 +354,6 @@ public class ZKDatabase {
 		} finally {
 			wl.unlock();
 		}
-	}
-
-	/**
-	 * A Runnable that aborts if it doesn't start running before it times out
-	 */
-	private static abstract class DroppableRunnable implements Runnable {
-		private final long constructionTime = System.nanoTime();
-		private final MessagingService.Verb verb;
-
-		public DroppableRunnable(MessagingService.Verb verb) {
-			this.verb = verb;
-		}
-
-		public final void run() {
-			if (TimeUnit.NANOSECONDS.toMillis(System.nanoTime()
-					- constructionTime) > DatabaseDescriptor.getTimeout(verb)) {
-				MessagingService.instance().incrementDroppedMessages(verb);
-				return;
-			}
-
-			try {
-				runMayThrow();
-			} catch (Exception e) {
-				throw new RuntimeException(e);
-			}
-		}
-
-		abstract protected void runMayThrow() throws Exception;
 	}
 
 	protected static final String CUR_VER = System.getProperty(

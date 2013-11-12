@@ -222,21 +222,21 @@ public class CommitLog implements CommitLogMBean
     	
     	if(org.apache.cassandra.service.CassandraDaemon.ZooServer != null){
 	    	if(CassandraDaemon.ZooServer.getServerState().equalsIgnoreCase("LEADING")){
-	    		logger.info("pgaref - LEADER: adding rowmutation in the CommitLog");
+	    		logger.debug("pgaref - LEADER: adding rowmutation in the CommitLog");
 	    		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 	        	try {
 	        		DataOutputStream out = new DataOutputStream(baos);
 					RowMutation.serializer.serialize(rm, out, getVersion());
 					out.close();
 				} catch (IOException e) {
-					logger.info("pgaref - LEADER: Serializer exception!");
+					logger.error("pgaref - LEADER: Serializer exception!");
 					e.printStackTrace();
 				}
 	    		org.apache.cassandra.service.CassandraDaemon.ZooServer.insertPersistent("/cassandra"+log_count, baos.toByteArray());
 	    		log_count++;
 	    	}
 	    	else{
-	    		logger.info("pgaref - Follower - Commitlog called!!!");
+	    		logger.debug("pgaref - Follower - Commitlog called!!!");
 	    	}
     	}
     	/*

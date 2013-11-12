@@ -325,7 +325,7 @@ public class Memtable
         private SSTableReader writeSortedContents(Future<ReplayPosition> context, File sstableDirectory)
         throws ExecutionException, InterruptedException
         {
-            logger.info("Writing {}", Memtable.this.toString());
+            logger.debug("Writing {}", Memtable.this.toString());
 
             SSTableReader ssTable;
             // errors when creating the writer that may leave empty temp files.
@@ -370,7 +370,7 @@ public class Memtable
                 {
                     writer.abort();
                     ssTable = null;
-                    logger.info("Completed flushing; nothing needed to be retained.  Commitlog position was {}",
+                    logger.debug("Completed flushing; nothing needed to be retained.  Commitlog position was {}",
                                 context.get());
                 }
                 return ssTable;
