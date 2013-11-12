@@ -24,17 +24,17 @@ import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
 import com.google.common.collect.*;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.apache.cassandra.db.*;
-import org.apache.cassandra.db.Keyspace;
 import org.apache.cassandra.db.marshal.AbstractType;
 import org.apache.cassandra.io.sstable.Descriptor;
 import org.apache.cassandra.service.MigrationManager;
 import org.apache.cassandra.tracing.Tracing;
 import org.apache.cassandra.utils.ByteBufferUtil;
 import org.apache.cassandra.utils.Pair;
+import org.apache.tools.ant.types.CommandlineJava.SysProperties;
 import org.cliffc.high_scale_lib.NonBlockingHashMap;
 
 public class Schema
@@ -338,14 +338,17 @@ public class Schema
      * (to make ColumnFamily lookup faster)
      *
      * @param cfm The ColumnFamily definition to load
+     * pgaref
      */
     public void load(CFMetaData cfm)
     {
         Pair<String, String> key = Pair.create(cfm.ksName, cfm.cfName);
-
-        if (cfIdMap.containsKey(key))
-            throw new RuntimeException(String.format("Attempting to load already loaded column family %s.%s", cfm.ksName, cfm.cfName));
-
+        
+        if (cfIdMap.containsKey(key)){
+        	logger.info("Attempting to load already loaded column family %s.%s", cfm.ksName, cfm.cfName);
+        	return;
+        }
+            
         logger.debug("Adding {} to cfIdMap", cfm);
         cfIdMap.put(key, cfm.cfId);
     }
