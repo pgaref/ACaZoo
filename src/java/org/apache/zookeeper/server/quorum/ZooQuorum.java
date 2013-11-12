@@ -87,7 +87,7 @@ public class ZooQuorum implements ZooEmbedded, Runnable {
 	public void insertPersistent(String blockname, byte[] data) {
 		// String blockname = "/foo";
 		// String data = "pgaref";
-		LOG.info("pgaref: Create Internal Called from Cassandra add CommitLOG entry!");
+		LOG.debug("pgaref: Create Internal Called from Cassandra add CommitLOG entry!");
 		int i = 0;
 		// pgaref -> 23 is the byte len of ZooDefs.Ids.OPEN_ACL_UNSAFE
 		int DataHeaderLength = 16 + blockname.length() + data.length + 23;
@@ -118,9 +118,9 @@ public class ZooQuorum implements ZooEmbedded, Runnable {
 			Requestdata.putInt(CreateMode.PERSISTENT.toFlag());
 			Requestdata.flip();
 		} catch (IOException ex) {
-			LOG.info("pgaref - Exception Serializing ACL List");
+			LOG.error("pgaref - Exception Serializing ACL List");
 		} catch (BufferOverflowException ex) {
-			LOG.info("BufferOverflowException: " + ex);
+			LOG.error("BufferOverflowException: " + ex);
 		}
 
 		/* DATA End here */
@@ -137,7 +137,7 @@ public class ZooQuorum implements ZooEmbedded, Runnable {
 		i++;
 		// FOR QUORUM
 		quorumPeer.getActiveServer().submitRequest(req);
-		LOG.info("Fake-Request is going to process!!!");
+		LOG.debug("Fake-Request is going to process!!!");
 
 	}
 
@@ -148,7 +148,7 @@ public class ZooQuorum implements ZooEmbedded, Runnable {
 			LOG.warn("Unable to register log4j JMX control", e);
 		}
 
-		LOG.info("Starting quorum peer");
+		LOG.debug("Starting quorum peer");
 		try {
 			cnxnFactory = ServerCnxnFactory.createFactory();
 			cnxnFactory.configure(config.getClientPortAddress(),
