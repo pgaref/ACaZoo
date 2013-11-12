@@ -22,9 +22,11 @@ import org.apache.cassandra.concurrent.StageManager;
 import org.apache.cassandra.config.Schema;
 import org.apache.cassandra.db.ColumnFamily;
 import org.apache.cassandra.db.ColumnFamilyStore;
+import org.apache.cassandra.db.DefsTables;
 import org.apache.cassandra.db.Keyspace;
 import org.apache.cassandra.db.RowMutation;
 import org.apache.cassandra.db.SystemKeyspace;
+import org.apache.cassandra.exceptions.ConfigurationException;
 import org.apache.cassandra.service.StorageService;
 import org.apache.cassandra.utils.FBUtilities;
 import org.apache.cassandra.utils.Pair;
@@ -163,7 +165,12 @@ public class MyRowMutationReplayer {
 					assert !newRm.isEmpty();
 					Keyspace.open(newRm.getKeyspaceName()).apply(newRm, true,
 							true);
-					StorageService.instance.loadNewSSTables(keyspace.getName(), frm.getColumnFamilies().iterator().next().id().toString());
+					try {
+						DefsTables.mergeSchema(Arrays.asList(frm));
+					} catch (ConfigurationException e) {
+						System.out.println("pgaref - TON POULO ");
+					}
+					//	StorageService.instance.(keyspace.getName(), frm.getColumnFamilies().iterator().next().id().toString());
 					/*
 					KSMetaData ksmd = Schema.instance.getKSMetaData(frm.getKeyspaceName());
 					for (CFMetaData cfm : ksmd.cfMetaData().values())
