@@ -368,7 +368,7 @@ public class ZKDatabase {
 					 * 
 					 * 
 					 */
-					
+					CommitLog.instance.add(tmp);
 					
 					}
 					
