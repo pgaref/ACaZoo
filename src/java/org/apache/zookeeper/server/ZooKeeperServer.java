@@ -110,17 +110,11 @@ public class ZooKeeperServer implements SessionExpirer, ServerStats.Provider {
     protected long hzxid = 0;
     public final static Exception ok = new Exception("No prob");
     /*
-     * pgaref
+     * pgaref - Extra Fields
      */
     public static RequestProcessor firstProcessor;
     public static RequestProcessor finalProcessor;
     protected volatile boolean running;
-
-    
-    /*
-     * pgaref
-     */
-    
     
     /**
      * This is the secret that we use to generate passwords, for the moment it

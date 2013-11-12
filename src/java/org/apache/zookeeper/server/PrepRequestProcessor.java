@@ -328,9 +328,13 @@ public class PrepRequestProcessor extends Thread implements RequestProcessor {
            //     LOG.info("pgaref - Before Serialization (request.request): "+ request.request.toString());
                 if(deserialize)
                     ByteBufferInputStream.byteBuffer2Record(request.request, createRequest);
-                // pgaref
-                LOG.info("pgaref - CREATE CHECK : " +  createRequest.toString() + " Path: " + createRequest.getPath() + " Data: " + createRequest.getData().toString() +
-   					 " ACL: "+  createRequest.getAcl().toString() + " Flags: "+ createRequest.getFlags());                
+			/*
+			 * pgaref - For Testing purposes LOG.info("pgaref - CREATE CHECK : "
+			 * + createRequest.toString() + " Path: " + createRequest.getPath()
+			 * + " Data: " + createRequest.getData().toString() + " ACL: "+
+			 * createRequest.getAcl().toString() + " Flags: "+
+			 * createRequest.getFlags());
+			 */              
                 String path = createRequest.getPath();
                 int lastSlash = path.lastIndexOf('/');
                 if (lastSlash == -1 || path.indexOf('\0') != -1 || failCreate) {
@@ -359,7 +363,7 @@ public class PrepRequestProcessor extends Thread implements RequestProcessor {
                  try{
                     PathUtils.validatePath(path);
                 } catch(IllegalArgumentException e) {
-                    LOG.info("Invalid path " + path + " with session 0x" +
+                    LOG.error("Invalid path " + path + " with session 0x" +
                             Long.toHexString(request.sessionId));
                     throw new KeeperException.BadArgumentsException(path);
                 }
@@ -540,8 +544,8 @@ public class PrepRequestProcessor extends Thread implements RequestProcessor {
                 
                  * pgaref
                  
-                else*/
                 LOG.info("pgaref - Request toString: "+ request.toString());
+                */
                 pRequest2Txn(request.type, zks.getNextZxid(), request, createRequest, true);
                 break;
             case OpCode.delete:

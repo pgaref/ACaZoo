@@ -84,9 +84,7 @@ public class FinalRequestProcessor implements RequestProcessor {
     }
 
     public void processRequest(Request request) {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Processing request:: " + request);
-        }
+    	
         /*pgaref
          *LOG.info("Processing request:: " +request.hdr.toString() + " ~  "+request.txn.toString()  );
          */
