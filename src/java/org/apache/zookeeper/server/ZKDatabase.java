@@ -47,6 +47,7 @@ import org.apache.cassandra.cache.RowCacheKey;
 import org.apache.cassandra.concurrent.Stage;
 import org.apache.cassandra.concurrent.StageManager;
 import org.apache.cassandra.config.CFMetaData;
+import org.apache.cassandra.config.DatabaseDescriptor;
 import org.apache.cassandra.config.KSMetaData;
 import org.apache.cassandra.config.Schema;
 import org.apache.cassandra.db.ColumnFamily;
@@ -60,11 +61,18 @@ import org.apache.cassandra.db.commitlog.CommitLogReplayer;
 import org.apache.cassandra.db.commitlog.MyRowMutationReplayer;
 import org.apache.cassandra.db.commitlog.ReplayPosition;
 import org.apache.cassandra.exceptions.ConfigurationException;
+import org.apache.cassandra.exceptions.InvalidRequestException;
+import org.apache.cassandra.exceptions.OverloadedException;
+import org.apache.cassandra.exceptions.RequestExecutionException;
+import org.apache.cassandra.exceptions.UnavailableException;
+import org.apache.cassandra.exceptions.WriteTimeoutException;
 import org.apache.cassandra.net.MessagingService;
 import org.apache.cassandra.service.CacheService;
 import org.apache.cassandra.service.CassandraDaemon;
 import org.apache.cassandra.service.MigrationManager;
+import org.apache.cassandra.service.StorageProxy;
 import org.apache.cassandra.service.StorageService;
+import org.apache.cassandra.thrift.ThriftConversion;
 import org.apache.cassandra.utils.ByteBufferUtil;
 import org.apache.cassandra.utils.FBUtilities;
 import org.apache.cassandra.utils.WrappedRunnable;
@@ -348,6 +356,21 @@ public class ZKDatabase {
 					tmp.apply();
 				    //tmp.applyUnsafe();
 					
+			        
+			            
+					try {
+						StorageProxy.mutateWithTriggers(Arrays.asList(tmp), org.apache.cassandra.db.ConsistencyLevel.ONE , false);
+					} catch (WriteTimeoutException e) {
+						System.out.println("PGAREF - mutateWithTriggers - WriteTimeoutException");
+					} catch (UnavailableException e) {
+						System.out.println("PGAREF - mutateWithTriggers -UnavailableException");
+					} catch (OverloadedException e) {
+						System.out.println("PGAREF - mutateWithTriggers -OverloadedException");
+					} catch (InvalidRequestException e) {
+						System.out.println("PGAREF - mutateWithTriggers -InvalidRequestException");
+					}
+						
+			       
 					
 						for(String range : 	StorageService.instance.getKeyspaces()){
 							System.out.println("pgaref - Keyspace : " + range);
