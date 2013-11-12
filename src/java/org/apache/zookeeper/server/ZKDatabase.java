@@ -345,8 +345,8 @@ public class ZKDatabase {
 				    //    recovery.recover(tmp);
 				    //    recovery.blockForWrites();
 				        //StorageService.instance.joinRing();
-					tmp.apply();
-				    //tmp.applyUnsafe();
+					//tmp.apply();
+				    tmp.applyUnsafe();
 					
 					
 						for(String range : 	StorageService.instance.getKeyspaces()){
@@ -367,7 +367,7 @@ public class ZKDatabase {
 					 * 
 					 * 
 					 */
-					CommitLog.instance.add(tmp);
+				//	CommitLog.instance.add(tmp);
 					
 					}
 					
