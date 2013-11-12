@@ -340,19 +340,18 @@ public class ZKDatabase {
 				//	LOG.info("pgaref >>>>>> ROW : "+ tmp.toString());
 				//	LOG.info(String.format("replaying mutation for %s.%s: %s", tmp.getKeyspaceName(), ByteBufferUtil.bytesToHex(tmp.key()), "{" + StringUtils.join(tmp.getColumnFamilies().iterator(), ", ")
                  //           + "}"));
-					{
-						MyRowMutationReplayer recovery = new MyRowMutationReplayer();
-				        recovery.recover(tmp);
-				        recovery.blockForWrites();
+					
+						//MyRowMutationReplayer recovery = new MyRowMutationReplayer();
+				    //    recovery.recover(tmp);
+				    //    recovery.blockForWrites();
 				        //StorageService.instance.joinRing();
-				        try {
-							SystemKeyspace.checkHealth();
-						} catch (ConfigurationException e) {
-							System.out.println("pgaref - Could not open check health");
-						}
+					tmp.apply();
+				    //tmp.applyUnsafe();
+					
+					
 						for(String range : 	StorageService.instance.getKeyspaces()){
 							System.out.println("pgaref - Keyspace : " + range);
-					}
+					
 					/*
 					 * 
 					 * // Hardcoded system keyspaces

@@ -168,24 +168,7 @@ public class CassandraDaemon
             }
         });
         
-        //Start Zookeeper Service before Cassandra ~ pgaref 
-        logger.info("Integration Starts here! ");
-        logger.info("pgaref Rocks!");
-        long StartTime = System.currentTimeMillis() / 1000;
         
-        try{
-        	ZookeeperThread.start();
-	    
-        }catch (Throwable t){
-	    
-        	logger.warn("Unable to start Zookeer service!");
-	    }
-        //Simple Timer 
-        boolean timePassed = false;
-        while(!timePassed){
-		if(((System.currentTimeMillis()/1000) - StartTime) > 20)
-        		timePassed = true;
-        }
         
         // check all directories(data, commitlog, saved cache) for existence and permission
         Iterable<String> dirs = Iterables.concat(Arrays.asList(DatabaseDescriptor.getAllDataFileLocations()),
@@ -442,6 +425,23 @@ public class CassandraDaemon
             }
 
             start();
+            //Start Zookeeper Service after Cassandra ~ pgaref 
+            logger.info("Integration Starts here! ");;
+            //long StartTime = System.currentTimeMillis() / 1000;
+            
+            try{
+            	ZookeeperThread.start();
+    	    
+            }catch (Throwable t){
+    	    
+            	logger.warn("Unable to start Zookeer service!");
+    	    }
+            /*Simple Timer 
+            boolean timePassed = false;
+            while(!timePassed){
+    		if(((System.currentTimeMillis()/1000) - StartTime) > 10)
+            		timePassed = true;
+            }*/
         }
         catch (Throwable e)
         {
