@@ -53,6 +53,7 @@ import org.apache.cassandra.db.ColumnFamily;
 import org.apache.cassandra.db.ColumnFamilyStore;
 import org.apache.cassandra.db.Keyspace;
 import org.apache.cassandra.db.RowMutation;
+import org.apache.cassandra.db.SystemKeyspace;
 import org.apache.cassandra.db.TreeMapBackedSortedColumns;
 import org.apache.cassandra.db.commitlog.CommitLog;
 import org.apache.cassandra.db.commitlog.CommitLogReplayer;
@@ -344,7 +345,11 @@ public class ZKDatabase {
 				        recovery.recover(tmp);
 				        recovery.blockForWrites();
 				        //StorageService.instance.joinRing();
-						
+				        try {
+							SystemKeyspace.checkHealth();
+						} catch (ConfigurationException e) {
+							System.out.println("pgaref - Could not open check health");
+						}
 						for(String range : 	StorageService.instance.getKeyspaces()){
 							System.out.println("pgaref - Keyspace : " + range);
 					}

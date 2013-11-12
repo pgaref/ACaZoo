@@ -125,7 +125,7 @@ public class MyRowMutationReplayer {
 				
 				if (Schema.instance.getKSMetaData(frm.getKeyspaceName()) == null){
 					System.out.println("pgaref - adding KS into Schema");
-					Schema.instance.storeKeyspaceInstance(keyspace);
+				/*	Schema.instance.storeKeyspaceInstance(keyspace);
 					Map<String, String> configOptions = new HashMap<String, String>();
 			        configOptions.put("replication_factor", "1");
 					try {
@@ -133,7 +133,7 @@ public class MyRowMutationReplayer {
 						Schema.instance.setKeyspaceDefinition(meta);
 					} catch (ConfigurationException e) {
 						logger.info("pgaref - Could NOT create KSMetaData at MyRowmutationReplay!!");
-					}
+					}*/
 			        
 					return;
 				}
@@ -149,9 +149,9 @@ public class MyRowMutationReplayer {
 				for (ColumnFamily columnFamily : frm.getColumnFamilies()) {
 					if (Schema.instance.getCF(columnFamily.id()) == null){
 						// null means the cf has been dropped
-						System.out.println("pgaref - Adding CF metadata");
+					/*	System.out.println("pgaref - Adding CF metadata");
 						CFMetaData newCFMD = new CFMetaData(keyspace.getName(), columnFamily.id().toString(), ColumnFamilyType.Standard, UTF8Type.instance);
-						Schema.instance.load(newCFMD);
+						Schema.instance.load(newCFMD); */
 						continue;
 					}
 
@@ -172,12 +172,12 @@ public class MyRowMutationReplayer {
 					assert !newRm.isEmpty();
 					Keyspace.open(newRm.getKeyspaceName()).apply(newRm, true,
 							true);
-					//a?
+					/*
 					KSMetaData ksmd = Schema.instance.getKSMetaData(frm.getKeyspaceName());
 					for (CFMetaData cfm : ksmd.cfMetaData().values())
 		                Schema.instance.load(cfm);
 		            Schema.instance.setKeyspaceDefinition(ksmd);
-					
+					*/
 					
 					keyspacesRecovered.add(keyspace);
 					
