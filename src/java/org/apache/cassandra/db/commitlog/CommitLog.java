@@ -220,22 +220,24 @@ public class CommitLog implements CommitLogMBean
     public void add(RowMutation rm)
     {
     	
-    	if(CassandraDaemon.ZooServer.getServerState().equalsIgnoreCase("LEADING") && (org.apache.cassandra.service.CassandraDaemon.ZooServer != null)){
-    		logger.info("pgaref - LEADER: adding rowmutation in the CommitLog");
-    		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        	try {
-        		DataOutputStream out = new DataOutputStream(baos);
-				RowMutation.serializer.serialize(rm, out, getVersion());
-				out.close();
-			} catch (IOException e) {
-				logger.info("pgaref - LEADER: Serializer exception!");
-				e.printStackTrace();
-			}
-    		org.apache.cassandra.service.CassandraDaemon.ZooServer.insertPersistent("/cassandra"+log_count, baos.toByteArray());
-    		log_count++;
-    	}
-    	else{
-    		logger.info("pgaref - Follower - Commitlog called!!!");
+    	if(org.apache.cassandra.service.CassandraDaemon.ZooServer != null){
+	    	if(CassandraDaemon.ZooServer.getServerState().equalsIgnoreCase("LEADING")){
+	    		logger.info("pgaref - LEADER: adding rowmutation in the CommitLog");
+	    		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+	        	try {
+	        		DataOutputStream out = new DataOutputStream(baos);
+					RowMutation.serializer.serialize(rm, out, getVersion());
+					out.close();
+				} catch (IOException e) {
+					logger.info("pgaref - LEADER: Serializer exception!");
+					e.printStackTrace();
+				}
+	    		org.apache.cassandra.service.CassandraDaemon.ZooServer.insertPersistent("/cassandra"+log_count, baos.toByteArray());
+	    		log_count++;
+	    	}
+	    	else{
+	    		logger.info("pgaref - Follower - Commitlog called!!!");
+	    	}
     	}
     	/*
     	if(QuorumPeerMain.getQuorumPeer().getServerState().equalsIgnoreCase("LEADING")){
