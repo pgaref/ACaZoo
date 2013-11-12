@@ -82,8 +82,8 @@ public class MyRowMutationReplayer {
 			cfPositions.put(cfs.metadata.cfId, rp);
 		}
 		globalPosition = replayPositionOrdering.min(cfPositions.values());
-		logger.info("Global replay position is {} from columnfamilies {}",
-				globalPosition, FBUtilities.toString(cfPositions));
+	//	logger.info("Global replay position is {} from columnfamilies {}",
+	//			globalPosition, FBUtilities.toString(cfPositions));
 	}
 
 	public int blockForWrites() {

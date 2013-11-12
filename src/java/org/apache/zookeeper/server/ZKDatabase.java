@@ -39,6 +39,8 @@ import org.apache.cassandra.concurrent.Stage;
 import org.apache.cassandra.concurrent.StageManager;
 import org.apache.cassandra.config.DatabaseDescriptor;
 import org.apache.cassandra.db.RowMutation;
+import org.apache.cassandra.db.commitlog.CommitLog;
+import org.apache.cassandra.db.commitlog.MyRowMutationReplayer;
 import org.apache.cassandra.net.MessagingService;
 import org.apache.cassandra.service.CassandraDaemon;
 import org.apache.cassandra.service.StorageService;
@@ -311,20 +313,10 @@ public class ZKDatabase {
 				//	LOG.info(String.format("replaying mutation for %s.%s: %s", tmp.getKeyspaceName(), ByteBufferUtil.bytesToHex(tmp.key()), "{" + StringUtils.join(tmp.getColumnFamilies().iterator(), ", ")
                  //           + "}"));
 					
-						//MyRowMutationReplayer recovery = new MyRowMutationReplayer();
-				    //    recovery.recover(tmp);
-				    //    recovery.blockForWrites();
-				        //StorageService.instance.joinRing();
+						MyRowMutationReplayer recovery = new MyRowMutationReplayer();
+				        recovery.recover(tmp);
+				        recovery.blockForWrites();
 					
-					Runnable runnable = new DroppableRunnable(MessagingService.Verb.MUTATION){
-			            public void runMayThrow()
-			            {
-			                tmp.apply();
-			            }
-			        };
-			        StageManager.getStage(Stage.MUTATION).execute(runnable);
-						
-			       
 					
 						for(String range : 	StorageService.instance.getKeyspaces()){
 							System.out.println("pgaref - Keyspace : " + range);
@@ -344,7 +336,7 @@ public class ZKDatabase {
 					 * 
 					 * 
 					 */
-				//	CommitLog.instance.add(tmp);
+					CommitLog.instance.add(tmp);
 					
 					}
 					
