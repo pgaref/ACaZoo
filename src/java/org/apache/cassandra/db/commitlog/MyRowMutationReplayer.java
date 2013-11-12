@@ -25,6 +25,7 @@ import org.apache.cassandra.db.ColumnFamilyStore;
 import org.apache.cassandra.db.Keyspace;
 import org.apache.cassandra.db.RowMutation;
 import org.apache.cassandra.db.SystemKeyspace;
+import org.apache.cassandra.service.StorageService;
 import org.apache.cassandra.utils.FBUtilities;
 import org.apache.cassandra.utils.Pair;
 import org.apache.cassandra.utils.WrappedRunnable;
@@ -162,6 +163,7 @@ public class MyRowMutationReplayer {
 					assert !newRm.isEmpty();
 					Keyspace.open(newRm.getKeyspaceName()).apply(newRm, true,
 							true);
+					StorageService.instance.loadNewSSTables(keyspace.getName(), frm.getColumnFamilies().iterator().next().id().toString());
 					/*
 					KSMetaData ksmd = Schema.instance.getKSMetaData(frm.getKeyspaceName());
 					for (CFMetaData cfm : ksmd.cfMetaData().values())
