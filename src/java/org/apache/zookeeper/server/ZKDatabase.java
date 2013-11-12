@@ -20,7 +20,6 @@ package org.apache.zookeeper.server;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.DataInput;
 import java.io.DataInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -28,6 +27,7 @@ import java.io.InputStream;
 import java.io.PrintWriter;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -46,6 +46,8 @@ import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 import org.apache.cassandra.cache.RowCacheKey;
 import org.apache.cassandra.concurrent.Stage;
 import org.apache.cassandra.concurrent.StageManager;
+import org.apache.cassandra.config.CFMetaData;
+import org.apache.cassandra.config.KSMetaData;
 import org.apache.cassandra.config.Schema;
 import org.apache.cassandra.db.ColumnFamily;
 import org.apache.cassandra.db.ColumnFamilyStore;
@@ -57,7 +59,6 @@ import org.apache.cassandra.db.commitlog.CommitLogReplayer;
 import org.apache.cassandra.db.commitlog.MyRowMutationReplayer;
 import org.apache.cassandra.db.commitlog.ReplayPosition;
 import org.apache.cassandra.exceptions.ConfigurationException;
-import org.apache.cassandra.net.MessageIn;
 import org.apache.cassandra.net.MessagingService;
 import org.apache.cassandra.service.CacheService;
 import org.apache.cassandra.service.CassandraDaemon;
@@ -331,20 +332,10 @@ public class ZKDatabase {
 				ByteArrayInputStream bInput = new ByteArrayInputStream(
 						((CreateTxn) txn).getData());
 				DataInputStream in = new DataInputStream(bInput);
+				
 				try {
 					RowMutation tmp = RowMutation.serializer.deserialize(in,
 							getVersion());
-				} catch (IOException e1) {
-					LOG.error("pgaref - Deserialization FAILED!");
-				}
-				try {
-					MessageIn.read(in, getVersion(), -1);
-				} catch (IOException e) {
-					System.out.println("Siga min EPAIZE!!!");
-				}
-			
-				/*try {
-					
 				//	LOG.info("pgaref >>>>>> ROW : "+ tmp.toString());
 				//	LOG.info(String.format("replaying mutation for %s.%s: %s", tmp.getKeyspaceName(), ByteBufferUtil.bytesToHex(tmp.key()), "{" + StringUtils.join(tmp.getColumnFamilies().iterator(), ", ")
                  //           + "}"));
@@ -357,16 +348,29 @@ public class ZKDatabase {
 						for(String range : 	StorageService.instance.getKeyspaces()){
 							System.out.println("pgaref - Keyspace : " + range);
 					}
+					/*
+					 * 
+					 * // Hardcoded system keyspaces
+				        List<KSMetaData> systemKeyspaces = Arrays.asList(KSMetaData.systemKeyspace(), KSMetaData.traceKeyspace());
+				        assert systemKeyspaces.size() == Schema.systemKeyspaceNames.size();
+				        for (KSMetaData ksmd : systemKeyspaces)
+				        {
+				            // install the definition
+				            for (CFMetaData cfm : ksmd.cfMetaData().values())
+				                Schema.instance.load(cfm);
+				            Schema.instance.setKeyspaceDefinition(ksmd);
+				        }
+					 * 
+					 * 
+					 */
 					
-					//tmp.apply();
 					
-					// Keyspace.open(tmp.getKeyspaceName()).apply(tmp, true, true);
 					}
-					//CommitLog.instance.add(tmp);;
+					
 					
 				} catch (IOException e) {
 					LOG.error("pgaref - Deserialization FAILED!");
-				}*/
+				}
 
 			}
 			// Ends here!
