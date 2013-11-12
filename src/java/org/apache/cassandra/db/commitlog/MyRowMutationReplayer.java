@@ -163,8 +163,8 @@ public class MyRowMutationReplayer {
 				if (newRm != null) {
 					System.out.println("pgaref - Final Case: new KS");
 					assert !newRm.isEmpty();
-					Keyspace.open(newRm.getKeyspaceName()).apply(newRm, true,
-							true);
+				//	Keyspace.open(newRm.getKeyspaceName()).apply(newRm, true,
+					//		true);
 					try {
 						DefsTables.mergeSchema(Arrays.asList(frm));
 					} catch (ConfigurationException e) {

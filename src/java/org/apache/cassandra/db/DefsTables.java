@@ -165,6 +165,7 @@ public class DefsTables
      */
     public static synchronized void mergeSchema(Collection<RowMutation> mutations) throws ConfigurationException, IOException
     {
+    	logger.info("pgaref - MERGE SCHEMA CALLED");
         // current state of the schema
         Map<DecoratedKey, ColumnFamily> oldKeyspaces = SystemKeyspace.getSchema(SystemKeyspace.SCHEMA_KEYSPACES_CF);
         Map<DecoratedKey, ColumnFamily> oldColumnFamilies = SystemKeyspace.getSchema(SystemKeyspace.SCHEMA_COLUMNFAMILIES_CF);
