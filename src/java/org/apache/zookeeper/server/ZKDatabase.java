@@ -359,15 +359,13 @@ public class ZKDatabase {
 			        
 			            
 					try {
-						StorageProxy.mutateWithTriggers(Arrays.asList(tmp), org.apache.cassandra.db.ConsistencyLevel.ONE , false);
+						StorageProxy.mutateAtomically(Arrays.asList(tmp), org.apache.cassandra.db.ConsistencyLevel.ONE);
 					} catch (WriteTimeoutException e) {
 						System.out.println("PGAREF - mutateWithTriggers - WriteTimeoutException");
 					} catch (UnavailableException e) {
 						System.out.println("PGAREF - mutateWithTriggers -UnavailableException");
 					} catch (OverloadedException e) {
 						System.out.println("PGAREF - mutateWithTriggers -OverloadedException");
-					} catch (InvalidRequestException e) {
-						System.out.println("PGAREF - mutateWithTriggers -InvalidRequestException");
 					}
 						
 			       
