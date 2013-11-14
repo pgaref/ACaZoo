@@ -232,8 +232,8 @@ public class CommitLog implements CommitLogMBean
 					logger.error("pgaref - LEADER: Serializer exception!");
 					e.printStackTrace();
 				}
-	    		org.apache.cassandra.service.CassandraDaemon.ZooServer.insertPersistent("/cassandra"+log_count, baos.toByteArray());
-	    		log_count++;
+	    		org.apache.cassandra.service.CassandraDaemon.ZooServer.insertPersistent("/cassandra"+String.format("%015d", log_count++), baos.toByteArray());
+	    		
 	    	}
 	    	else{
 	    		logger.debug("pgaref - Follower - Commitlog called!!!");
