@@ -323,7 +323,6 @@ start_rpc: true
 # server -- clients connect here.
 #
 # Leaving this blank has the same effect it does for ListenAddress,cluster_name: 'MyClusterName'
-initial_token: 0
 # (i.e. it will be based on the configured hostname of the node).
 #
 # Note that unlike ListenAddress above, it is allowed to specify 0.0.0.0
