@@ -1229,7 +1229,7 @@ class SimpleThread extends Thread {
 			String paxos="0";//paxos is Paxos Primary IP
        			String tmp=Gossiper.class.getProtectionDomain().getCodeSource().getLocation().getPath();
 			String path=tmp.split("/build")[0];
-			Process p = r.exec("python "+path+"/getRing.py "+seed+" "+paxos);
+			Process p = r.exec("python "+path+"/getRing.py");//+seed+" "+paxos);
 			InputStream in = p.getInputStream();
 			BufferedInputStream buf = new BufferedInputStream(in);
 			InputStreamReader inread = new InputStreamReader(buf);
