@@ -2,11 +2,11 @@ import sys
 import os
 from kazoo.client import KazooClient
 
-if (len(sys.argv)<2):
-	sys.exit(0)
-os.chdir(os.path.dirname(os.path.abspath(__file__)))
-seed=sys.argv[1]
-mngr_master=sys.argv[2]
+#if (len(sys.argv)<2):
+#	sys.exit(0)
+#os.chdir(os.path.dirname(os.path.abspath(__file__)))
+seed=109.231.85.85
+mngr_master=109.231.85.43:2181
 if (mngr_master.find(".")<0)
 	print "getRing$ ERROR: Not correct IP address format"
 	sys.exit()
@@ -28,6 +28,7 @@ while i<len(s):
 	if "%" in s[i]:
 		st=st+s[i].split("rack")[0]+"<>"+s[i].split("%")[1]+"|"
 	i=i+1
+print "\n\n"+st+"\n\n"
 if zk.exists("/cassRing"):
 	data, stat = zk.get("/cassRing")
 	print("Version: %s, data: %s" % (stat.version, data.decode("utf-8")))	
