@@ -824,6 +824,9 @@ public class Gossiper implements IFailureDetectionEventListener, GossiperMBean
         logger.info("InetAddress {} is now DOWN", addr);
         for (IEndpointStateChangeSubscriber subscriber : subscribers)
             subscriber.onDead(addr, localState);
+new SimpleThread().start();
+System.out.println("\n\nI am notifying clients in Configuration Manager for the dead node...\n\n\n\n\n\n");
+
         if (logger.isTraceEnabled())
             logger.trace("Notified " + subscribers);
     }
@@ -861,7 +864,7 @@ public class Gossiper implements IFailureDetectionEventListener, GossiperMBean
         for (IEndpointStateChangeSubscriber subscriber : subscribers)
             subscriber.onJoin(ep, epState);
 new SimpleThread().start();
-System.out.println("\n\nI am notifying clients in Configuration Manager...\n\n\n\n\n\n");
+System.out.println("\n\nI am notifying clients in Configuration Manager for the joining node...\n\n\n\n\n\n");
     }
 
     private boolean isDeadState(EndpointState epState)
