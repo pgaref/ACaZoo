@@ -351,10 +351,10 @@ public class Leader implements Watcher {
     	try {
     		ZooKeeper zk = new ZooKeeper("109.231.85.43:2181", 10000, this);
     		if((zk.exists("/cazooMaster", this)) == null){
-    			zk.create("/cazooMaster", ("Master: "+myip).getBytes(), Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
+    			zk.create("/cazooMaster", ("Master:"+myip).getBytes(), Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
     		}
     		else{
-    			zk.setData("/cazooMaster", ("Master: "+myip).getBytes(), -1);
+    			zk.setData("/cazooMaster", ("Master:"+myip).getBytes(), -1);
     		}
     		
     		zk.close();
