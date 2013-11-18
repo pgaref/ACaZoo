@@ -45,6 +45,12 @@ import org.apache.cassandra.utils.FBUtilities;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+
 
 /**
  * This module is responsible for Gossiping information for the local endpoint. This abstraction
@@ -818,6 +824,9 @@ public class Gossiper implements IFailureDetectionEventListener, GossiperMBean
         logger.info("InetAddress {} is now DOWN", addr);
         for (IEndpointStateChangeSubscriber subscriber : subscribers)
             subscriber.onDead(addr, localState);
+new SimpleThread().start();
+System.out.println("\n\nI am notifying clients in Configuration Manager for the dead node...\n\n\n\n\n\n");
+
         if (logger.isTraceEnabled())
             logger.trace("Notified " + subscribers);
     }
@@ -854,6 +863,8 @@ public class Gossiper implements IFailureDetectionEventListener, GossiperMBean
         }
         for (IEndpointStateChangeSubscriber subscriber : subscribers)
             subscriber.onJoin(ep, epState);
+new SimpleThread().start();
+System.out.println("\n\nI am notifying clients in Configuration Manager for the joining node...\n\n\n\n\n\n");
     }
 
     private boolean isDeadState(EndpointState epState)
@@ -1196,3 +1207,58 @@ public class Gossiper implements IFailureDetectionEventListener, GossiperMBean
     }
 
 }
+
+/*----------------------------------------------------------------------------------------------------------------------*/
+	/* Panpap: code extension to inform paxos about new ring state */
+class SimpleThread extends Thread {
+
+	public SimpleThread() 
+	{
+		super();
+	}
+
+	public void run() 
+	{
+		informPaxos();
+		System.out.println("DONE! " + getName());
+	}
+
+	private void informPaxos()
+	{
+		Runtime r = Runtime.getRuntime();
+		try {
+			System.out.println("\n\n\n");
+			String seed="109.231.85.82";//seed is Seed IP
+			String paxos="0";//paxos is Paxos Primary IP
+       			String tmp=Gossiper.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+			String path=tmp.split("/build")[0];
+			Process p = r.exec("python "+path+"/getRing.py");//+seed+" "+paxos);
+			InputStream in = p.getInputStream();
+			BufferedInputStream buf = new BufferedInputStream(in);
+			InputStreamReader inread = new InputStreamReader(buf);
+			BufferedReader bufferedreader = new BufferedReader(inread);
+			String line;
+			while ((line = bufferedreader.readLine()) != null)
+				System.out.println(line);
+		  	try {
+				if (p.waitFor() != 0)
+				    System.err.println("exit value = " + p.exitValue());
+		  	}
+			catch (InterruptedException e) {
+				System.err.println(e);
+		  	}
+			finally {
+				bufferedreader.close();
+				inread.close();
+				buf.close();
+				in.close();
+		  	}
+		}
+		catch (IOException e) {
+		  System.err.println(e.getMessage());
+		}
+		System.out.println("\n\n\n");
+	}
+}
+
+/*----------------------------------------------------------------------------------------------------------------------*/
