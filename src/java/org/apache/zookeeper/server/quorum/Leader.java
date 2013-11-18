@@ -350,7 +350,7 @@ public class Leader implements Watcher {
     public void notifyCF(String myip){
     	try {
     		ZooKeeper zk = new ZooKeeper("109.231.85.43:2181", 10000, this);
-    		zk.create("/cazooMaster", ("Master: "+myip).getBytes(), Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT_SEQUENTIAL);
+    		zk.create("/cazooMaster", ("Master: "+myip).getBytes(), Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
     		zk.close();
     		} catch (KeeperException ke) {
         	  LOG.info("CaZoo KeeperException "+ke);
