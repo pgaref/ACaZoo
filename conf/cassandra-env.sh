@@ -76,7 +76,7 @@ calculate_heap_sizes()
     max_sensible_yg_per_core_in_mb="100"
     max_sensible_yg_in_mb=`expr $max_sensible_yg_per_core_in_mb "*" $system_cpu_cores`
 
-    desired_yg_in_mb=`expr $max_heap_size_in_mb / 4`
+    desired_yg_in_mb=`expr $max_heap_size_in_mb / 2`
 
     if [ "$desired_yg_in_mb" -gt "$max_sensible_yg_in_mb" ]
     then
@@ -129,8 +129,8 @@ esac
 # times. If in doubt, and if you do not particularly want to tweak, go with
 # 100 MB per physical CPU core.
 
-#MAX_HEAP_SIZE="4G"
-#HEAP_NEWSIZE="800M"
+MAX_HEAP_SIZE="2G"
+HEAP_NEWSIZE="200M"
 
 if [ "x$MAX_HEAP_SIZE" = "x" ] && [ "x$HEAP_NEWSIZE" = "x" ]; then
     calculate_heap_sizes
