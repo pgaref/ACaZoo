@@ -38,6 +38,12 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ConcurrentMap;
 
 import org.apache.jute.BinaryOutputArchive;
+import org.apache.zookeeper.CreateMode;
+import org.apache.zookeeper.KeeperException;
+import org.apache.zookeeper.WatchedEvent;
+import org.apache.zookeeper.Watcher;
+import org.apache.zookeeper.ZooDefs.Ids;
+import org.apache.zookeeper.ZooKeeper;
 import org.apache.zookeeper.server.FinalRequestProcessor;
 import org.apache.zookeeper.server.Request;
 import org.apache.zookeeper.server.RequestProcessor;
@@ -50,7 +56,7 @@ import org.slf4j.LoggerFactory;
 /**
  * This class has the control logic for the Leader.
  */
-public class Leader {
+public class Leader implements Watcher {
     private static final Logger LOG = LoggerFactory.getLogger(Leader.class);
     
     static final private boolean nodelay = System.getProperty("leader.nodelay", "true").equals("true");
@@ -334,6 +340,36 @@ public class Leader {
     boolean waitingForNewEpoch = true;
     volatile boolean readyToStart = false;
     
+    
+    
+    /* 
+     * pgaref  - Notify Configuration manager
+     * 
+     */
+    
+    public void notifyCF(String myip){
+    	try {
+    		ZooKeeper zk = new ZooKeeper("109.231.85.43:2181", 10000, this);
+    		zk.create("/cazooMaster", ("Master: "+myip).getBytes(), Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT_SEQUENTIAL);
+    		zk.close();
+    		} catch (KeeperException ke) {
+        	  LOG.info("CaZoo KeeperException "+ke);
+    		}catch (InterruptedException ke1) {
+        	  LOG.info("CaZoo InterruptedException "+ ke1);
+          	}catch (IOException ke2) {
+          		LOG.info("CaZoo IOException "+ke2);
+          	}
+    	
+    }
+    /*
+     * pgaref - Watcher
+     * @see org.apache.zookeeper.Watcher#process(org.apache.zookeeper.WatchedEvent)
+     */
+    @Override
+	synchronized public void process(WatchedEvent event) {
+	      LOG.info("CaZoo: New Master event sent to CF Manager " + event.toString());
+	  }
+	
     /**
      * This method is main function that is called to lead
      * 
@@ -346,7 +382,10 @@ public class Leader {
               (self.end_fle - self.start_fle));
         self.start_fle = 0;
         self.end_fle = 0;
-
+        
+        /* pgaref NOTIFY now! */
+        notifyCF(self.getQuorumAddress().toString());
+        
         zk.registerJMX(new LeaderBean(this, zk), self.jmxLocalPeerBean);
 
         try {
