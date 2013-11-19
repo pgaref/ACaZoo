@@ -126,7 +126,7 @@ public class ZooQuorum implements ZooEmbedded, Runnable {
 
 		/* DATA End here */
 
-		long zxid = ZxidUtils.makeZxid(1, CommitLog.log_count);
+		long zxid = ZxidUtils.makeZxid(1, ++CommitLog.log_count);
 		TxnHeader hdr = new TxnHeader(1, 10 + (int)CommitLog.log_count, zxid, 30 + (int)CommitLog.log_count,
 				ZooDefs.OpCode.create);
 		Record txn = new CreateTxn(blockname, data,
