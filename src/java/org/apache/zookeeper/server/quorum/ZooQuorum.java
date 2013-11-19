@@ -8,6 +8,7 @@ import java.nio.ByteBuffer;
 
 import javax.management.JMException;
 
+import org.apache.cassandra.db.commitlog.CommitLog;
 import org.apache.jute.BinaryOutputArchive;
 import org.apache.jute.OutputArchive;
 import org.apache.jute.Record;
@@ -88,7 +89,7 @@ public class ZooQuorum implements ZooEmbedded, Runnable {
 		// String blockname = "/foo";
 		// String data = "pgaref";
 		LOG.debug("pgaref: Create Internal Called from Cassandra add CommitLOG entry!");
-		int i = 0;
+		//int i = 0; => Will Be replaced by a global ZID taken from CommitLog!!!
 		// pgaref -> 23 is the byte len of ZooDefs.Ids.OPEN_ACL_UNSAFE
 		int DataHeaderLength = 16 + blockname.length() + data.length + 23;
 		// ByteBuffer Requestdata = ByteBuffer.allocate(DataHeaderLength);
@@ -125,8 +126,8 @@ public class ZooQuorum implements ZooEmbedded, Runnable {
 
 		/* DATA End here */
 
-		long zxid = ZxidUtils.makeZxid(1, i);
-		TxnHeader hdr = new TxnHeader(1, 10 + i, zxid, 30 + i,
+		long zxid = ZxidUtils.makeZxid(1, CommitLog.log_count);
+		TxnHeader hdr = new TxnHeader(1, 10 + (int)CommitLog.log_count, zxid, 30 + (int)CommitLog.log_count,
 				ZooDefs.OpCode.create);
 		Record txn = new CreateTxn(blockname, data,
 				ZooDefs.Ids.OPEN_ACL_UNSAFE, false, 1);
@@ -134,7 +135,7 @@ public class ZooQuorum implements ZooEmbedded, Runnable {
 				null);
 		req.hdr = hdr;
 		req.txn = txn;
-		i++;
+		//i++;
 		// FOR QUORUM
 		quorumPeer.getActiveServer().submitRequest(req);
 		LOG.debug("Fake-Request is going to process!!!");
