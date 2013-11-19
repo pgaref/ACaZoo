@@ -391,7 +391,7 @@ public class Leader implements Watcher {
         
         /* pgaref NOTIFY now! */
         notifyCF(self.getQuorumAddress().toString());
-        
+        System.out.println("pgaref - FAILOVER - New Leader: "+ (System.currentTimeMillis() /1000));
         zk.registerJMX(new LeaderBean(this, zk), self.jmxLocalPeerBean);
 
         try {
