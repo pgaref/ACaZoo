@@ -320,7 +320,7 @@ public class ZKDatabase {
 					
 					//fix Local counter counter
 					//Parse Path after /cassandra!!!
-					CommitLog.instance.log_count = Long.parseLong(LocalPath.substring(12));
+					CommitLog.log_count = Long.parseLong(LocalPath.substring(12));
 					recovery.recover(tmp);
 					recovery.blockForWrites();
 					CommitLog.instance.add(tmp);

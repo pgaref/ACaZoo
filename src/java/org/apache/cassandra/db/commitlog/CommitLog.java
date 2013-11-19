@@ -212,7 +212,7 @@ public class CommitLog implements CommitLogMBean
     /*
      * pgaref - ZKServer add commitLog Entry!
      */
-    public long log_count = 0;
+    public static long log_count = 0;
     public void add(RowMutation rm)
     {
     	
