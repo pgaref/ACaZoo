@@ -299,10 +299,11 @@ public class ZKDatabase {
 				LOG.debug("------------------------> pgaref Deserialising..... ");// +
 																					// new
 																					// String(((CreateTxn)
-																					// txn).getData()));
+				String LocalPath = ((CreateTxn) txn).getPath();																	// txn).getData()));
 				// Deserialize and....
 				ByteArrayInputStream bInput = new ByteArrayInputStream(
 						((CreateTxn) txn).getData());
+				
 				DataInputStream in = new DataInputStream(bInput);
 
 				try {
@@ -316,6 +317,10 @@ public class ZKDatabase {
 					// ", ")
 					// + "}"));
 					MyRowMutationReplayer recovery = new MyRowMutationReplayer();
+					
+					//fix Local counter counter
+					//Parse Path after /cassandra!!!
+					CommitLog.instance.log_count = Long.parseLong(LocalPath.substring(11));
 					recovery.recover(tmp);
 					recovery.blockForWrites();
 					CommitLog.instance.add(tmp);
