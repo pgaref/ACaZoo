@@ -298,8 +298,7 @@ public class ZKDatabase {
 				}
 				LOG.debug("------------------------> pgaref Deserialising..... ");// +
 																					// new
-																					// String(((CreateTxn)
-				String LocalPath = ((CreateTxn) txn).getPath();																	// txn).getData()));
+																					// String(((CreateTxn)															// txn).getData()));
 				// Deserialize and....
 				ByteArrayInputStream bInput = new ByteArrayInputStream(
 						((CreateTxn) txn).getData());
@@ -320,7 +319,7 @@ public class ZKDatabase {
 					
 					//fix Local counter counter
 					//Parse Path after /cassandra!!!
-					CommitLog.log_count = Long.parseLong(LocalPath.substring(12));
+					CommitLog.log_count = hdr.getZxid();
 					recovery.recover(tmp);
 					recovery.blockForWrites();
 					CommitLog.instance.add(tmp);
