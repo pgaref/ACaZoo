@@ -311,8 +311,9 @@ public class ZKDatabase {
 					LOG.debug("pgaref >>>>>> ROW : "+ tmp.toString());
 					//fix Local counter counter
 					//Parse Path after /cassandra!!!
-					CommitLog.log_count = hdr.getZxid();
 					
+					CommitLog.log_count = hdr.getZxid();
+					CommitLog.instance.add(tmp);
 					
 					// LOG.info(String.format("replaying mutation for %s.%s: %s",
 					// tmp.getKeyspaceName(),
