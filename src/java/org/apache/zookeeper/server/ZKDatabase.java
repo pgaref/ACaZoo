@@ -309,20 +309,25 @@ public class ZKDatabase {
 					final RowMutation tmp = RowMutation.serializer.deserialize(
 							in, getVersion());
 					LOG.debug("pgaref >>>>>> ROW : "+ tmp.toString());
+					//fix Local counter counter
+					//Parse Path after /cassandra!!!
+					CommitLog.log_count = hdr.getZxid();
+					
+					
 					// LOG.info(String.format("replaying mutation for %s.%s: %s",
 					// tmp.getKeyspaceName(),
 					// ByteBufferUtil.bytesToHex(tmp.key()), "{" +
 					// StringUtils.join(tmp.getColumnFamilies().iterator(),
 					// ", ")
 					// + "}"));
+					/* pgaref FOR TESTING ONLY PUT IN COMMENTS!! 
 					MyRowMutationReplayer recovery = new MyRowMutationReplayer();
 					
-					//fix Local counter counter
-					//Parse Path after /cassandra!!!
-					CommitLog.log_count = hdr.getZxid();
 					recovery.recover(tmp);
 					recovery.blockForWrites();
 					CommitLog.instance.add(tmp);
+					
+					******* ENDS HERE!! */
 					
 					/*
 					 * 
