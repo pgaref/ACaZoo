@@ -304,16 +304,14 @@ public class ZKDatabase {
 						((CreateTxn) txn).getData());
 				
 				DataInputStream in = new DataInputStream(bInput);
-
+				/* pgaref FOR TESTING ONLY PUT IN COMMENTS!! 
 				try {
 					final RowMutation tmp = RowMutation.serializer.deserialize(
 							in, getVersion());
 					LOG.debug("pgaref >>>>>> ROW : "+ tmp.toString());
 					//fix Local counter counter
 					//Parse Path after /cassandra!!!
-					
 					CommitLog.log_count = hdr.getZxid();
-					CommitLog.instance.add(tmp);
 					
 					// LOG.info(String.format("replaying mutation for %s.%s: %s",
 					// tmp.getKeyspaceName(),
@@ -321,37 +319,17 @@ public class ZKDatabase {
 					// StringUtils.join(tmp.getColumnFamilies().iterator(),
 					// ", ")
 					// + "}"));
-					/* pgaref FOR TESTING ONLY PUT IN COMMENTS!! 
+					
 					MyRowMutationReplayer recovery = new MyRowMutationReplayer();
 					
 					recovery.recover(tmp);
 					recovery.blockForWrites();
 					CommitLog.instance.add(tmp);
 					
-					******* ENDS HERE!! */
-					
-					/*
-					 * 
-					 * for (String range :
-					 * StorageService.instance.getKeyspaces()) {
-					 * System.out.println("pgaref - Keyspace : " + range); }
-					 * 
-					 * 
-					 * // Hardcoded system keyspaces List<KSMetaData>
-					 * systemKeyspaces =
-					 * Arrays.asList(KSMetaData.systemKeyspace(),
-					 * KSMetaData.traceKeyspace()); assert
-					 * systemKeyspaces.size() ==
-					 * Schema.systemKeyspaceNames.size(); for (KSMetaData ksmd :
-					 * systemKeyspaces) { // install the definition for
-					 * (CFMetaData cfm : ksmd.cfMetaData().values())
-					 * Schema.instance.load(cfm);
-					 * Schema.instance.setKeyspaceDefinition(ksmd); }
-					 */
 
 				} catch (IOException e) {
 					LOG.error("pgaref - Deserialization FAILED!");
-				}
+				}******* ENDS HERE!! */
 
 			}
 			// Ends here!
