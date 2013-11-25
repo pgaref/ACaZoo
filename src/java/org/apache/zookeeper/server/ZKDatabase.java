@@ -338,7 +338,7 @@ public class ZKDatabase {
 				
 				/* pgaref - Now I Have to Clean Previous Znode NOW!!!! */
 				
-				if(CommitLog.log_count > 1L){
+				if(CommitLog.log_count > 10L){
 					//Its the first Znode!
 					long tmp = CommitLog.log_count;
 					try {
