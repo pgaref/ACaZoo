@@ -239,11 +239,11 @@ public class CommitLog implements CommitLogMBean
 	    	//pgaref Master - Now Delete previous Znode !!
 	    	if(log_count > 1L){
 				//Its the first Znode!
-				CommitLog.log_count--;
+				long tmp = CommitLog.log_count - 1;
 				try {
-					org.apache.cassandra.service.CassandraDaemon.ZooServer.delete("/cassandra"+String.format("%015d", CommitLog.log_count), log_count);
+					org.apache.cassandra.service.CassandraDaemon.ZooServer.delete("/cassandra"+String.format("%015d", tmp), tmp);
 				} catch (NoNodeException e) {
-					logger.error("pgaref - CaZoo M Cannot delete previous Znode!!! : " +log_count);
+					logger.error("pgaref - CaZoo M Cannot delete previous Znode!!! : " +tmp);
 				}
 			}
 	    	
