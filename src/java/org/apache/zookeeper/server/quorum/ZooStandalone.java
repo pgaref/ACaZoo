@@ -10,6 +10,7 @@ import org.apache.jute.OutputArchive;
 import org.apache.jute.Record;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.ZooDefs;
+import org.apache.zookeeper.KeeperException.NoNodeException;
 import org.apache.zookeeper.ZooDefs.OpCode;
 import org.apache.zookeeper.server.DatadirCleanupManager;
 import org.apache.zookeeper.server.Request;
@@ -135,7 +136,7 @@ public class ZooStandalone implements ZooEmbedded ,Runnable {
 	}
 
 	@Override
-	public void delete(String blockname) {
+	public void delete(String blockname,long zxid)throws NoNodeException {
 		// TODO Auto-generated method stub
 	}
 

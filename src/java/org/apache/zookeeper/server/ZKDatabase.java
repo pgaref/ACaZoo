@@ -333,21 +333,24 @@ public class ZKDatabase {
 				} catch (IOException e) {
 					LOG.error("pgaref - Deserialization FAILED!");
 				}******* ENDS HERE!! */
+				
+				
+				
+				/* pgaref - Now I Have to Clean Previous Znode NOW!!!! */
+				
+				if(CommitLog.log_count > 1L){
+					//Its the first Znode!
+					CommitLog.log_count--;
+					try {
+						this.dataTree.deleteNode("/cassandra"+String.format("%015d", CommitLog.log_count), CommitLog.log_count);
+					} catch (NoNodeException e) {
+						LOG.error("pgaref - CaZoo F Cannot delete previous Znode!!!" +CommitLog.log_count + "Hdr ID: "+ hdr.getZxid());
+					}
+				}
 
 			}
 			// Ends here!
 			
-			/* pgaref - I Have to Clean Previous Znode NOW!!!! */
-			
-			if(CommitLog.log_count > 1L){
-				//Its the first Znode!
-				CommitLog.log_count--;
-				try {
-					this.dataTree.deleteNode("/cassandra"+String.format("%015d", CommitLog.log_count), CommitLog.log_count);
-				} catch (NoNodeException e) {
-					LOG.error("pgaref - CaZoo Cannot delete previous Znode!!!" + Long.toString(CommitLog.log_count));
-				}
-			}
 			
 
 			Proposal p = new Proposal();

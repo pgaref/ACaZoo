@@ -89,7 +89,7 @@ public class QuorumPeer extends Thread implements QuorumStats.Provider {
      * bootup and only thrown away in case of a truncate
      * message from the leader
      */
-    private ZKDatabase zkDb;
+    public ZKDatabase zkDb;
 
     public static class QuorumServer {
         public QuorumServer(long id, InetSocketAddress addr,

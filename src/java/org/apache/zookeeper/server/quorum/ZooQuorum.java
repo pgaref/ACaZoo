@@ -13,6 +13,7 @@ import org.apache.jute.BinaryOutputArchive;
 import org.apache.jute.OutputArchive;
 import org.apache.jute.Record;
 import org.apache.zookeeper.CreateMode;
+import org.apache.zookeeper.KeeperException.NoNodeException;
 import org.apache.zookeeper.ZooDefs;
 import org.apache.zookeeper.ZooDefs.OpCode;
 import org.apache.zookeeper.jmx.ManagedUtil;
@@ -186,9 +187,8 @@ public class ZooQuorum implements ZooEmbedded, Runnable {
 	}
 
 	@Override
-	public void delete(String blockname) {
-		// TODO Auto-generated method stub
-
+	public void delete(String blockname, long zxid) throws NoNodeException {
+		ZooQuorum.quorumPeer.zkDb.getDataTree().deleteNode(blockname, zxid);
 	}
 
 	@Override

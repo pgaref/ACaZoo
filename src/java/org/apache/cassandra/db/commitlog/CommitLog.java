@@ -45,6 +45,7 @@ import org.apache.cassandra.net.MessagingService;
 import org.apache.cassandra.service.CassandraDaemon;
 import org.apache.cassandra.utils.FBUtilities;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.zookeeper.KeeperException.NoNodeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -234,6 +235,20 @@ public class CommitLog implements CommitLogMBean
 	    	else{
 	    		logger.debug("pgaref - Follower - Commitlog called!!!");
 	    	}
+	    	
+	    	//pgaref Master - Now Delete previous Znode !!
+	    	if(log_count > 1L){
+				//Its the first Znode!
+				CommitLog.log_count--;
+				try {
+					org.apache.cassandra.service.CassandraDaemon.ZooServer.delete("/cassandra"+String.format("%015d", CommitLog.log_count), log_count);
+				} catch (NoNodeException e) {
+					logger.error("pgaref - CaZoo M Cannot delete previous Znode!!! : " +log_count);
+				}
+			}
+	    	
+	    	
+	    	
     	}
     	/*
     	if(QuorumPeerMain.getQuorumPeer().getServerState().equalsIgnoreCase("LEADING")){

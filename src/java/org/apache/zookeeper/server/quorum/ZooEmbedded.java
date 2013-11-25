@@ -1,5 +1,7 @@
 package org.apache.zookeeper.server.quorum;
 
+import org.apache.zookeeper.KeeperException.NoNodeException;
+
 public interface ZooEmbedded {
 	
 	/* Create Configuration Files and Classes */
@@ -17,7 +19,7 @@ public interface ZooEmbedded {
 	public void insertPersistent(String blockname, byte[] data);
 	
 	/* Delete a spefic znode */
-	public void delete(String blockname);
+	public void delete(String blockname,long zxid) throws NoNodeException;
 	
 	/* Periodic cleanup of znodes  to avoid memory FULL */
 	public void memoryCleanup();
