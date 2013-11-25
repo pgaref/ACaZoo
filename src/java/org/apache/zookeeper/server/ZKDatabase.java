@@ -339,13 +339,13 @@ public class ZKDatabase {
 			
 			/* pgaref - I Have to Clean Previous Znode NOW!!!! */
 			
-			if(CommitLog.log_count != 1){
+			if(CommitLog.log_count > 1){
 				//Its the first Znode!
 				CommitLog.log_count--;
 				try {
 					this.dataTree.deleteNode("/cassandra"+String.format("%015d", CommitLog.log_count), CommitLog.log_count);
 				} catch (NoNodeException e) {
-					LOG.error("pgaref - CaZoo Cannot delete previous Znode!!!");
+					LOG.error("pgaref - CaZoo Cannot delete previous Znode!!!" + CommitLog.log_count);
 				}
 			}
 			
