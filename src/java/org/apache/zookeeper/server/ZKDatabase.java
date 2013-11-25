@@ -344,7 +344,7 @@ public class ZKDatabase {
 					try {
 						this.dataTree.deleteNode("/cassandra"+String.format("%015d", tmp),tmp);
 					} catch (NoNodeException e) {
-						LOG.error("pgaref - CaZoo F Cannot delete previous Znode!!!" +tmp + "Hdr ID: "+ hdr.getZxid());
+						LOG.error("pgaref - CaZoo F Cannot delete previous Znode!!!" +tmp + "Hdr ID: "+ hdr.getZxid() + " | "+ e.toString());
 					}
 				}
 
