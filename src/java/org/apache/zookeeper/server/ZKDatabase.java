@@ -33,6 +33,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
+
 import org.apache.cassandra.db.RowMutation;
 import org.apache.cassandra.db.commitlog.CommitLog;
 import org.apache.cassandra.db.commitlog.MyRowMutationReplayer;
@@ -304,14 +305,16 @@ public class ZKDatabase {
 						((CreateTxn) txn).getData());
 				
 				DataInputStream in = new DataInputStream(bInput);
+				
+				//fix Local counter counter - Parse Path after /cassandra!!!
+				CommitLog.log_count = hdr.getZxid();
+				
 				/* pgaref FOR TESTING ONLY PUT IN COMMENTS!! 
 				try {
 					final RowMutation tmp = RowMutation.serializer.deserialize(
 							in, getVersion());
 					LOG.debug("pgaref >>>>>> ROW : "+ tmp.toString());
-					//fix Local counter counter
-					//Parse Path after /cassandra!!!
-					CommitLog.log_count = hdr.getZxid();
+					
 					
 					// LOG.info(String.format("replaying mutation for %s.%s: %s",
 					// tmp.getKeyspaceName(),
@@ -333,6 +336,19 @@ public class ZKDatabase {
 
 			}
 			// Ends here!
+			
+			/* pgaref - I Have to Clean Previous Znode NOW!!!! */
+			
+			if(CommitLog.log_count != 1){
+				//Its the first Znode!
+				CommitLog.log_count--;
+				try {
+					this.dataTree.deleteNode("/cassandra"+String.format("%015d", CommitLog.log_count), CommitLog.log_count);
+				} catch (NoNodeException e) {
+					LOG.error("pgaref - CaZoo Cannot delete previous Znode!!!");
+				}
+			}
+			
 
 			Proposal p = new Proposal();
 			p.packet = pp;
