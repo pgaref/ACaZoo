@@ -232,9 +232,9 @@ public class CommitLog implements CommitLogMBean
 	    		org.apache.cassandra.service.CassandraDaemon.ZooServer.insertPersistent("/cassandra"+String.format("%015d", log_count), baos.toByteArray());
 	    		
 	    		/*pgaref Master - Now Delete previous Znode !!*/
-		    	if(log_count > 100L){
+		    	if(log_count > 1000L){
 					//Its the first Znode!
-					long tmp = (log_count - 102L);
+					long tmp = (log_count - 1002L);
 					try {
 						org.apache.cassandra.service.CassandraDaemon.ZooServer.delete("/cassandra"+String.format("%015d", tmp), tmp);
 					} catch (NoNodeException e) {
