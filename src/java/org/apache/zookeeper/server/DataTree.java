@@ -541,7 +541,7 @@ public class DataTree {
         String childName = path.substring(lastSlash + 1);
         DataNode node = nodes.get(path);
         for(String key : nodes.keySet()){
-        	System.out.println("GOT: "+ nodes.get(key));
+        	System.out.println("GOT="+path + "key: "+ key +" value: "+ nodes.get(key));
         }
         
         if (node == null) {
