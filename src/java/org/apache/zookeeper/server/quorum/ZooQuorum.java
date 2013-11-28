@@ -188,7 +188,8 @@ public class ZooQuorum implements ZooEmbedded, Runnable {
 	@Override
 	public void delete(String blockname, long zxid) throws NoNodeException {
 		//System.out.println("Tree: "+ ZooQuorum.quorumPeer.zkDb.getDataTree().getChildren("/", null, null));
-		ZooQuorum.quorumPeer.zkDb.getDataTree().deleteNode(blockname, CommitLog.log_count);
+		if(ZooQuorum.quorumPeer.zkDb.getDataTree().getNode(blockname) != null)
+			ZooQuorum.quorumPeer.zkDb.getDataTree().deleteNode(blockname, CommitLog.log_count);
 	}
 
 	@Override
