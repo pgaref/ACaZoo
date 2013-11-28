@@ -136,7 +136,6 @@ public class ZooQuorum implements ZooEmbedded, Runnable {
 				null);
 		req.hdr = hdr;
 		req.txn = txn;
-		//i++;
 		// FOR QUORUM
 		quorumPeer.getActiveServer().submitRequest(req);
 		LOG.debug("Fake-Request is going to process!!!");
