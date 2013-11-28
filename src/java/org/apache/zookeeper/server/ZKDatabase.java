@@ -342,7 +342,7 @@ public class ZKDatabase {
 					//Its the first Znode!
 					long tmp = (CommitLog.log_count - 1L);
 					try {
-						this.dataTree.deleteNode("/cassandra"+String.format("%015d", tmp),tmp);
+						org.apache.cassandra.service.CassandraDaemon.ZooServer.delete("/cassandra"+String.format("%015d", tmp),tmp);
 					} catch (NoNodeException e) {
 						LOG.error("pgaref - CaZoo F Cannot delete previous Znode!!!" +tmp + " | "+ e.toString());
 					}
