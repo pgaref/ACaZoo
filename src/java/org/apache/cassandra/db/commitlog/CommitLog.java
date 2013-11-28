@@ -236,7 +236,7 @@ public class CommitLog implements CommitLogMBean
 					//Its the first Znode!
 					long tmp = log_count - 1;
 					try {
-						org.apache.cassandra.service.CassandraDaemon.ZooServer.delete("/cassandra"+String.format("%015d", tmp), tmp);
+						org.apache.cassandra.service.CassandraDaemon.ZooServer.delete("/cassandra", tmp);
 					} catch (NoNodeException e) {
 						logger.error("pgaref - CaZoo M Cannot delete previous Znode!!! : " +tmp +" | "+ e.toString());
 					}
