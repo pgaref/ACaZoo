@@ -307,7 +307,7 @@ public class ZKDatabase {
 				DataInputStream in = new DataInputStream(bInput);
 				
 				//fix Local counter counter - Parse Path after /cassandra!!!
-				CommitLog.log_count = hdr.getZxid();
+				CommitLog.log_count = Long.parseLong(((CreateTxn) txn).getPath().substring(10));
 				
 				/* pgaref FOR TESTING ONLY PUT IN COMMENTS!! 
 				try {
