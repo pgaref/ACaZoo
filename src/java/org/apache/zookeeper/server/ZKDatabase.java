@@ -336,17 +336,17 @@ public class ZKDatabase {
 				
 				
 				
-				/* pgaref - Now I Have to Clean Previous Znode NOW!!!! 
+				/* pgaref - Now I Have to Clean Previous Znode NOW!!!! */
 				
 				if(CommitLog.log_count > 1L){
 					//Its the first Znode!
-					long tmp = CommitLog.log_count;
+					long tmp = (CommitLog.log_count - 2L);
 					try {
-						this.dataTree.deleteNode("/cassandra"+String.format("%015d", tmp)+"/",tmp);
+						this.dataTree.deleteNode("/cassandra"+String.format("%015d", tmp),tmp);
 					} catch (NoNodeException e) {
 						LOG.error("pgaref - CaZoo F Cannot delete previous Znode!!!" +tmp + "Hdr ID: "+ hdr.getZxid() + " | "+ e.toString());
 					}
-				}*/
+				}
 
 			}
 			// Ends here!

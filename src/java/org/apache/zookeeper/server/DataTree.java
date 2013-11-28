@@ -540,10 +540,6 @@ public class DataTree {
         String parentName = path.substring(0, lastSlash);
         String childName = path.substring(lastSlash + 1);
         DataNode node = nodes.get(path);
-        for(String key : nodes.keySet()){
-        	System.out.println("GOT="+path + "key: "+ key +" value: "+ nodes.get(key));
-        }
-        
         if (node == null) {
             throw new KeeperException.NoNodeException();
         }
