@@ -340,7 +340,7 @@ public class ZKDatabase {
 				
 				if(CommitLog.log_count > 100L){
 					//Its the first Znode!
-					long tmp = (CommitLog.log_count - 1L);
+					long tmp = (CommitLog.log_count - 101L);
 					try {
 						this.dataTree.deleteNode("/cassandra"+String.format("%015d", tmp),tmp);
 					} catch (NoNodeException e) {
