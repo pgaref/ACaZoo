@@ -229,7 +229,7 @@ public class CommitLog implements CommitLogMBean
 					logger.error("pgaref - LEADER: Serializer exception!");
 					e.printStackTrace();
 				}
-	    		org.apache.cassandra.service.CassandraDaemon.ZooServer.insertPersistent("/cassandra"+String.format("%015d", log_count), baos.toByteArray());
+	    		org.apache.cassandra.service.CassandraDaemon.ZooServer.insertPersistent("/cassandra"+String.format("%015d", ++log_count), baos.toByteArray());
 	    		
 	    		/*pgaref Master - Now Delete previous Znode !!*/
 		    	if(log_count > 1L){
