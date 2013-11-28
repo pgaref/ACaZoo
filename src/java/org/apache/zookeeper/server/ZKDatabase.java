@@ -336,7 +336,7 @@ public class ZKDatabase {
 				
 				
 				
-				/* pgaref - Now I Have to Clean Previous Znode NOW!!!! */
+				/* pgaref - Now I Have to Clean Previous Znode NOW!!!! 
 				
 				if(CommitLog.log_count > Long.parseLong("1")){
 					//Its the first Znode!
@@ -346,7 +346,7 @@ public class ZKDatabase {
 					} catch (NoNodeException e) {
 						LOG.error("pgaref - CaZoo F Cannot delete previous Znode!!!" +tmp + "Hdr ID: "+ hdr.getZxid() + " | "+ e.toString());
 					}
-				}
+				}*/
 
 			}
 			// Ends here!
