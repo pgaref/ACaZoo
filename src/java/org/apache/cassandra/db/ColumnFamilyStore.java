@@ -26,6 +26,7 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Pattern;
+
 import javax.management.*;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -33,10 +34,10 @@ import com.google.common.base.Function;
 import com.google.common.collect.*;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.Uninterruptibles;
+
 import org.cliffc.high_scale_lib.NonBlockingHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.apache.cassandra.cache.IRowCacheEntry;
 import org.apache.cassandra.cache.RowCacheKey;
 import org.apache.cassandra.cache.RowCacheSentinel;
@@ -730,7 +731,11 @@ public class ColumnFamilyStore implements ColumnFamilyStoreMBean
                 }
                 else
                 {
+                	//pgaref was here
                     logger.info("Enqueuing flush of {}", memtable);
+                    long CurrTime = (System.currentTimeMillis() -org.apache.cassandra.service.CassandraDaemon.compactionTimer)/1000;
+                    org.apache.cassandra.db.compaction.CompactionTask.MyLogWriter("AcaZoo: " + CurrTime +" "+ "Enqueuing flush of memtable: "+ memtable);
+                    
                     memtable.flushAndSignal(latch, ctx);
                 }
             }

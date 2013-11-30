@@ -328,7 +328,7 @@ public class CompactionTask extends AbstractCompactionTask
         return max;
     }
     //pgaref Added This Method!
-    private void MyLogWriter(String towrite) {
+    public static synchronized void  MyLogWriter(String towrite) {
 		try {
 			File file = new File("AcaZoo-CompactionStats" + ".dat");
 
