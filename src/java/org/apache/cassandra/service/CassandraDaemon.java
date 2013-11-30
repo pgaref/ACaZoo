@@ -80,6 +80,10 @@ public class CassandraDaemon
         }
     }, "Exit invoker");
     
+    //Timer for compaction
+    public static long compactionTimer; 
+    
+    
     //pgaref Zookeeper Thread
     private static final Thread ZookeeperThread = new Thread(new Runnable()
     {
@@ -423,7 +427,9 @@ public class CassandraDaemon
                 System.out.close();
                 System.err.close();
             }
-
+            //pgaref Timer
+            compactionTimer = System.currentTimeMillis();
+            
             start();
             //Start Zookeeper Service after Cassandra ~ pgaref 
             logger.info("Integration Starts here! ");;

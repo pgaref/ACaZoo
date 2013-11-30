@@ -17,17 +17,19 @@
  */
 package org.apache.cassandra.db.compaction;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 import com.google.common.base.Throwables;
 import com.google.common.collect.Sets;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.apache.cassandra.config.DatabaseDescriptor;
 import org.apache.cassandra.db.*;
 import org.apache.cassandra.db.compaction.CompactionManager.CompactionExecutorStatsCollector;
@@ -113,6 +115,8 @@ public class CompactionTask extends AbstractCompactionTask
         // so in our single-threaded compaction world this is a valid way of determining if we're compacting
         // all the sstables (that existed when we started)
         logger.info("Compacting {}", toCompact);
+        long CurrTime = (System.currentTimeMillis() -org.apache.cassandra.service.CassandraDaemon.compactionTimer)/1000;
+        MyLogWriter("AcaZoo Start time: " +CurrTime +" | "+  toCompact);
 
         long start = System.nanoTime();
         long totalkeysWritten = 0;
@@ -267,10 +271,14 @@ public class CompactionTask extends AbstractCompactionTask
                 totalSourceRows += rows * count;
                 mergeSummary.append(String.format("%d:%d, ", rows, count));
             }
-
+            CurrTime = (System.currentTimeMillis() -org.apache.cassandra.service.CassandraDaemon.compactionTimer)/1000;
             logger.info(String.format("Compacted %d sstables to [%s].  %,d bytes to %,d (~%d%% of original) in %,dms = %fMB/s.  %,d total rows, %,d unique.  Row merge counts were {%s}",
                                       toCompact.size(), builder.toString(), startsize, endsize, (int) (ratio * 100), dTime, mbps, totalSourceRows, totalkeysWritten, mergeSummary.toString()));
             logger.debug(String.format("CF Total Bytes Compacted: %,d", CompactionTask.addToTotalBytesCompacted(endsize)));
+            
+            MyLogWriter("AcaZoo End time: "+ CurrTime + " "+ String.format("Compacted %d sstables to [%s].  %,d bytes to %,d (~%d%% of original) in %,dms = %fMB/s.  %,d total rows, %,d unique.  Row merge counts were {%s}",
+                    toCompact.size(), builder.toString(), startsize, endsize, (int) (ratio * 100), dTime, mbps, totalSourceRows, totalkeysWritten, mergeSummary.toString()) + 
+                    String.format("CF Total Bytes Compacted: %,d", CompactionTask.addToTotalBytesCompacted(endsize)));
         }
     }
 
@@ -319,4 +327,26 @@ public class CompactionTask extends AbstractCompactionTask
         }
         return max;
     }
+    //pgaref Added This Method!
+    private void MyLogWriter(String towrite) {
+		try {
+			File file = new File("AcaZoo-CompactionStats" + ".dat");
+
+			// if file doesnt exists, then create it
+			if (!file.exists()) {
+				file.createNewFile();
+			}
+			// true = append file
+			FileWriter fileWritter = new FileWriter(file.getName(), true);
+			BufferedWriter bufferWritter = new BufferedWriter(fileWritter);
+			bufferWritter.write(towrite + "\n");
+			bufferWritter.close();
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+	}
+    
+    
 }
