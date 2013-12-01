@@ -111,6 +111,8 @@ public class CassandraDaemon
      */
     protected void setup()
     {
+    	//pgaref Timer
+        compactionTimer = System.currentTimeMillis();
         // log warnings for different kinds of sub-optimal JVMs.  tldr use 64-bit Oracle >= 1.6u32
         if (!System.getProperty("os.arch").contains("64"))
             logger.info("32bit JVM detected.  It is recommended to run Cassandra on a 64bit JVM for better performance.");
@@ -427,8 +429,6 @@ public class CassandraDaemon
                 System.out.close();
                 System.err.close();
             }
-            //pgaref Timer
-            compactionTimer = System.currentTimeMillis();
             
             start();
             //Start Zookeeper Service after Cassandra ~ pgaref 
