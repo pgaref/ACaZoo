@@ -29,5 +29,15 @@ public interface ZooEmbedded {
 	 * For quorum: Following or Leading
 	 */
 	public String getServerState();
+	
+	/*
+	 * Custom Elections For AcaZoo Compaction Scheduling!
+	 * 
+	 */
+	
+	public void TrigerRandomElections();
+	
+	
+	public void TrigerRoundRobbinElection();
 
 }

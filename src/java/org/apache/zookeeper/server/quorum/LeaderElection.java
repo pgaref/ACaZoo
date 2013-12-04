@@ -34,7 +34,6 @@ import java.util.Map.Entry;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.apache.zookeeper.jmx.MBeanRegistry;
 import org.apache.zookeeper.server.quorum.Vote;
 import org.apache.zookeeper.server.quorum.QuorumPeer.LearnerType;
@@ -292,4 +291,168 @@ public class LeaderElection implements Election  {
             self.jmxLeaderElectionBean = null;
         }
     }
+    
+    /*
+     * pgaref ~ AcaZ00 Mod
+     * @see org.apache.zookeeper.server.quorum.Election#AcazooRRlookForLeader()
+     */
+    @Override
+	public Vote AcazooRRlookForLeader() throws InterruptedException {
+		// Round Robbin voting!
+		int voteid = 0;
+		if (QuorumPeerMain.quorumPeer.getId() == 2)
+			voteid = 3;
+		else if (QuorumPeerMain.quorumPeer.getId() == 3)
+			voteid = 1;
+		else
+			voteid = 2;
+		
+		try {
+            self.jmxLeaderElectionBean = new LeaderElectionBean();
+            MBeanRegistry.getInstance().register(
+                    self.jmxLeaderElectionBean, self.jmxLocalPeerBean);
+        } catch (Exception e) {
+            LOG.warn("Failed to register with JMX", e);
+            self.jmxLeaderElectionBean = null;
+        }
+
+        try {
+            self.setCurrentVote(new Vote(voteid,
+                    self.getLastLoggedZxid()));
+            // We are going to look for a leader by casting a vote for ourself
+            byte requestBytes[] = new byte[4];
+            ByteBuffer requestBuffer = ByteBuffer.wrap(requestBytes);
+            byte responseBytes[] = new byte[28];
+            ByteBuffer responseBuffer = ByteBuffer.wrap(responseBytes);
+            /* The current vote for the leader. Initially me! */
+            DatagramSocket s = null;
+            try {
+                s = new DatagramSocket();
+                s.setSoTimeout(200);
+            } catch (SocketException e1) {
+                LOG.error("Socket exception when creating socket for leader election", e1);
+                System.exit(4);
+            }
+            DatagramPacket requestPacket = new DatagramPacket(requestBytes,
+                    requestBytes.length);
+            DatagramPacket responsePacket = new DatagramPacket(responseBytes,
+                    responseBytes.length);
+            int xid = epochGen.nextInt();
+            while (self.isRunning()) {
+                HashMap<InetSocketAddress, Vote> votes =
+                    new HashMap<InetSocketAddress, Vote>(self.getVotingView().size());
+
+                requestBuffer.clear();
+                requestBuffer.putInt(xid);
+                requestPacket.setLength(4);
+                HashSet<Long> heardFrom = new HashSet<Long>();
+                for (QuorumServer server : self.getVotingView().values()) {
+                    LOG.info("Server address: " + server.addr);
+                    try {
+                        requestPacket.setSocketAddress(server.addr);
+                    } catch (IllegalArgumentException e) {
+                        // Sun doesn't include the address that causes this
+                        // exception to be thrown, so we wrap the exception
+                        // in order to capture this critical detail.
+                        throw new IllegalArgumentException(
+                                "Unable to set socket address on packet, msg:"
+                                + e.getMessage() + " with addr:" + server.addr,
+                                e);
+                    }
+
+                    try {
+                        s.send(requestPacket);
+                        responsePacket.setLength(responseBytes.length);
+                        s.receive(responsePacket);
+                        if (responsePacket.getLength() != responseBytes.length) {
+                            LOG.error("Got a short response: "
+                                    + responsePacket.getLength());
+                            continue;
+                        }
+                        responseBuffer.clear();
+                        int recvedXid = responseBuffer.getInt();
+                        if (recvedXid != xid) {
+                            LOG.error("Got bad xid: expected " + xid
+                                    + " got " + recvedXid);
+                            continue;
+                        }
+                        long peerId = responseBuffer.getLong();
+                        heardFrom.add(peerId);
+                        //if(server.id != peerId){
+                            Vote vote = new Vote(responseBuffer.getLong(),
+                                responseBuffer.getLong());
+                            InetSocketAddress addr =
+                                (InetSocketAddress) responsePacket
+                                .getSocketAddress();
+                            votes.put(addr, vote);
+                        //}
+                    } catch (IOException e) {
+                        LOG.warn("Ignoring exception while looking for leader",
+                                e);
+                        // Errors are okay, since hosts may be
+                        // down
+                    }
+                }
+
+                ElectionResult result = countVotes(votes, heardFrom);
+                // ZOOKEEPER-569:
+                // If no votes are received for live peers, reset to voting 
+                // for ourselves as otherwise we may hang on to a vote 
+                // for a dead peer                 
+                if (result.numValidVotes == 0) {
+                    self.setCurrentVote(new Vote(self.getId(),
+                            self.getLastLoggedZxid()));
+                } else {
+                    if (result.winner.getId() >= 0) {
+                        self.setCurrentVote(result.vote);
+                        // To do: this doesn't use a quorum verifier
+                        if (result.winningCount > (self.getVotingView().size() / 2)) {
+                            self.setCurrentVote(result.winner);
+                            s.close();
+                            Vote current = self.getCurrentVote();
+                            LOG.info("Found leader: my type is: " + self.getLearnerType());
+                            /*
+                             * We want to make sure we implement the state machine
+                             * correctly. If we are a PARTICIPANT, once a leader
+                             * is elected we can move either to LEADING or 
+                             * FOLLOWING. However if we are an OBSERVER, it is an
+                             * error to be elected as a Leader.
+                             */
+                            if (self.getLearnerType() == LearnerType.OBSERVER) {
+                                if (current.getId() == self.getId()) {
+                                    // This should never happen!
+                                    LOG.error("OBSERVER elected as leader!");
+                                    Thread.sleep(100);
+                                }
+                                else {
+                                    self.setPeerState(ServerState.OBSERVING);
+                                    Thread.sleep(100);
+                                    return current;
+                                }
+                            } else {
+                                self.setPeerState((current.getId() == self.getId())
+                                        ? ServerState.LEADING: ServerState.FOLLOWING);
+                                if (self.getPeerState() == ServerState.FOLLOWING) {
+                                    Thread.sleep(100);
+                                }                            
+                                return current;
+                            }
+                        }
+                    }
+                }
+                Thread.sleep(1000);
+            }
+            return null;
+        } finally {
+            try {
+                if(self.jmxLeaderElectionBean != null){
+                    MBeanRegistry.getInstance().unregister(
+                            self.jmxLeaderElectionBean);
+                }
+            } catch (Exception e) {
+                LOG.warn("Failed to unregister with JMX", e);
+            }
+            self.jmxLeaderElectionBean = null;
+        }
+	}
 }

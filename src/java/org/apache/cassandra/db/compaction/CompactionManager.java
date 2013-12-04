@@ -123,6 +123,11 @@ public class CompactionManager implements CompactionManagerMBean
      * It's okay to over-call (within reason) if a call is unnecessary, it will
      * turn into a no-op in the bucketing/candidate-scan phase.
      */
+    
+    /*
+     * pgaref just thoughs, add code here to check if Leader -> Triger new Elections!!!
+     * 
+     */
     public List<Future<?>> submitBackground(final ColumnFamilyStore cfs)
     {
         if (cfs.isAutoCompactionDisabled())

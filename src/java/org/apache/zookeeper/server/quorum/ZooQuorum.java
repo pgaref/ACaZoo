@@ -203,4 +203,44 @@ public class ZooQuorum implements ZooEmbedded, Runnable {
 		return quorumPeer.getServerState();
 	}
 
+	@Override
+	public void TrigerRandomElections() {
+		try{
+	    	if (ZooQuorum.quorumPeer.getServerState().equalsIgnoreCase("LEADING"))
+	    	{
+	    		System.out.println("\n\n\nTRIGGER ELECTIONS\n\n\n");
+	    		
+	    		ZooQuorum.quorumPeer.leader.shutdown("~Acazoo Compaction Scheduling~");
+	    		Thread.sleep(1000);
+				
+	    		Vote tmp = ZooQuorum.quorumPeer.getElectionAlg().lookForLeader();
+	    		System.out.println("\n~~~~~~~~~~~~~~~~~~~~~~~~~~ Leader Voted for " + tmp);
+				//QuorumPeerMain.quorumPeer.startLeaderElection();
+			}
+       } catch (InterruptedException e1) {
+    	   	System.out.println("oe oe");
+       }
+		
+	}
+
+	@Override
+	public void TrigerRoundRobbinElection() {
+		try{
+	    	if (ZooQuorum.quorumPeer.getServerState().equalsIgnoreCase("LEADING"))
+	    	{
+	    		System.out.println("\nTRIGGER ELECTIONS\n");
+	    		
+	    		ZooQuorum.quorumPeer.leader.shutdown("~Acazoo Compaction Scheduling~");
+	    		Thread.sleep(1000);
+				
+	    		Vote tmp = ZooQuorum.quorumPeer.getElectionAlg().AcazooRRlookForLeader();
+	    		System.out.println("\n~~~~~~~~~~~~~~~~~~~~~~~~~~ Leader Voted for " + tmp);
+				//QuorumPeerMain.quorumPeer.startLeaderElection();
+			}
+       } catch (InterruptedException e1) {
+    	   	System.out.println("oe oe");
+       }
+		
+	}
+
 }

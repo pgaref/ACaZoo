@@ -34,6 +34,7 @@ import org.apache.cassandra.config.DatabaseDescriptor;
 import org.apache.cassandra.db.*;
 import org.apache.cassandra.db.compaction.CompactionManager.CompactionExecutorStatsCollector;
 import org.apache.cassandra.io.sstable.*;
+import org.apache.cassandra.service.CassandraDaemon;
 import org.apache.cassandra.utils.CloseableIterator;
 
 public class CompactionTask extends AbstractCompactionTask
@@ -116,6 +117,13 @@ public class CompactionTask extends AbstractCompactionTask
         // all the sstables (that existed when we started)
         logger.info("Compacting {}", toCompact);
         long CurrTime = (System.currentTimeMillis() -org.apache.cassandra.service.CassandraDaemon.compactionTimer)/1000;
+        System.out.println("\nTRIED TO START COMPACTION!!!!!!!\n");
+        if(CassandraDaemon.ZooServer.getServerState().equalsIgnoreCase("LEADING")){
+        	CassandraDaemon.ZooServer.TrigerRoundRobbinElection();
+        	Thread.sleep(3000);
+        }
+        
+        
         MyLogWriter("AcaZoo Start time: " +CurrTime +" | "+  toCompact);
 
         long start = System.nanoTime();

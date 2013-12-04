@@ -163,6 +163,20 @@ public class ZooStandalone implements ZooEmbedded ,Runnable {
 		
 	}
 
+	@Override
+	public void TrigerRandomElections() {
+		
+		LOG.error("Acaz00 ~ ZK Standalone Cannot Elect anything!!");
+		
+	}
+
+	@Override
+	public void TrigerRoundRobbinElection() {
+		
+		LOG.error("Acaz00 ~ ZK Standalone Cannot Elect anything!!");
+		
+	}
+
 	
 
 }

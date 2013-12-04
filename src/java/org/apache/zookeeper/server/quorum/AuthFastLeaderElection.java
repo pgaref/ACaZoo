@@ -32,13 +32,11 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.Semaphore;
-
 import java.util.concurrent.TimeUnit;
 import java.util.Random;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.apache.zookeeper.jmx.MBeanRegistry;
 import org.apache.zookeeper.server.quorum.Election;
 import org.apache.zookeeper.server.quorum.Vote;
@@ -975,4 +973,10 @@ public class AuthFastLeaderElection implements Election {
             self.jmxLeaderElectionBean = null;
         }
     }
+
+	@Override
+	public Vote AcazooRRlookForLeader() throws InterruptedException {
+		LOG.error("Acaz00 AuthFLE not implemented yet!!!!");
+		return null;
+	}
 }
