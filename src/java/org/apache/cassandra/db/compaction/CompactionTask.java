@@ -120,7 +120,7 @@ public class CompactionTask extends AbstractCompactionTask
         System.out.println("\nTRIED TO START COMPACTION!!!!!!!\n");
         if(CassandraDaemon.ZooServer.getServerState().equalsIgnoreCase("LEADING")){
         	CassandraDaemon.ZooServer.TrigerRoundRobbinElection();
-        	Thread.sleep(3000);
+        	Thread.sleep(5000);
         }
         
         
