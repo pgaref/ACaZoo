@@ -118,12 +118,12 @@ public class CompactionTask extends AbstractCompactionTask
         logger.info("Compacting {}", toCompact);
         long CurrTime = (System.currentTimeMillis() -org.apache.cassandra.service.CassandraDaemon.compactionTimer)/1000;
         
-        /* pgaref - Compaction Scheduling 
+        /* pgaref - Compaction Scheduling  */
         System.out.println("\nTRIED TO START COMPACTION!!!!!!!\n");
         if(CassandraDaemon.ZooServer.getServerState().equalsIgnoreCase("LEADING")){
         	CassandraDaemon.ZooServer.TrigerRoundRobbinElection();
         	Thread.sleep(5000);
-        }*/
+        }
         
         
         MyLogWriter("AcaZoo Start time: " +CurrTime +" | "+  toCompact);
