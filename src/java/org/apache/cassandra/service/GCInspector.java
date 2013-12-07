@@ -111,6 +111,7 @@ public class GCInspector
 
             String st = String.format("GC for %s: %s ms for %s collections, %s used; max is %s",
                                       gc.getName(), duration, count - previousCount, memoryUsed, memoryMax);
+            org.apache.cassandra.db.compaction.CompactionTask.MyLogWriter("AcaZoo " +st);
             long durationPerCollection = duration / (count - previousCount);
             if (durationPerCollection > MIN_DURATION)
                 logger.info(st);
