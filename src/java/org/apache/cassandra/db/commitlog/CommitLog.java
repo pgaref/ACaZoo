@@ -216,8 +216,9 @@ public class CommitLog implements CommitLogMBean
     public static long log_count = 0;
     public void add(RowMutation rm)
     {
-    	
+    	/*
     	if(org.apache.cassandra.service.CassandraDaemon.ZooServer != null){
+    		
 	    	if(CassandraDaemon.ZooServer.getServerState().equalsIgnoreCase("LEADING")){
 	    		logger.debug("pgaref - LEADER: adding rowmutation in the CommitLog");
 	    		ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -231,7 +232,7 @@ public class CommitLog implements CommitLogMBean
 				}
 	    		org.apache.cassandra.service.CassandraDaemon.ZooServer.insertPersistent("/cassandra"+String.format("%015d", ++log_count), baos.toByteArray());
 	    		
-	    		/*pgaref Master - Now Delete previous Znode !!*/
+	    		/*pgaref Master - Now Delete previous Znode !!*
 		    	if(log_count > 1L){
 					//Its the first Znode!
 					long tmp = (log_count - 2L);
@@ -247,7 +248,7 @@ public class CommitLog implements CommitLogMBean
 			}
 	    	
 	    	
-    	}
+    	}*/
     	/*
     	if(QuorumPeerMain.getQuorumPeer().getServerState().equalsIgnoreCase("LEADING")){
         	logger.info("pgaref - Master: adding rowmutation in the CommitLog");
