@@ -216,7 +216,7 @@ public class CommitLog implements CommitLogMBean
     public static long log_count = 0;
     public void add(RowMutation rm)
     {
-    	/*
+    	
     	if(org.apache.cassandra.service.CassandraDaemon.ZooServer != null){
     		
 	    	if(CassandraDaemon.ZooServer.getServerState().equalsIgnoreCase("LEADING")){
@@ -241,15 +241,18 @@ public class CommitLog implements CommitLogMBean
 					} catch (NoNodeException e) {
 						logger.error("pgaref - CaZoo M Cannot delete previous Znode!!! : " +tmp +" | "+ e.toString());
 					}
-		    	}
+		    	}*/
 	    	}
 	    	else{
 	    		logger.debug("pgaref - Follower - Commitlog called!!!");
 			}
 	    	
 	    	
-    	}*/
+    	}
+    	
     	/*
+    	 * LEGACY CODE --- pgaref!
+    	 * 
     	if(QuorumPeerMain.getQuorumPeer().getServerState().equalsIgnoreCase("LEADING")){
         	logger.info("pgaref - Master: adding rowmutation in the CommitLog");
         	ByteArrayOutputStream baos = new ByteArrayOutputStream();
