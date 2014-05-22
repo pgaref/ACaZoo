@@ -97,7 +97,7 @@ public class CompactionTask extends AbstractCompactionTask
     	if(CassandraDaemon.ZooServer.getServerState().equalsIgnoreCase("LEADING")){
             //	CassandraDaemon.ZooServer.TrigerRoundRobbinElection();
             //	Thread.sleep(5000);
-            	logger.info("AcaZoo - Trying to avoid compaction!!!! ", " Extra");
+            	System.out.println("AcaZoo - Trying to avoid compaction!!!! ");
             	return;
         }
         // The collection of sstables passed may be empty (but not null); even if
