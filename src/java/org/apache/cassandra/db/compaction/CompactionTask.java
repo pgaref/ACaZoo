@@ -91,20 +91,21 @@ public class CompactionTask extends AbstractCompactionTask
      * Caller is in charge of marking/unmarking the sstables as compacting.
      */
     protected void runWith(File sstableDirectory) throws Exception
-    {
+    {	
+    	// The collection of sstables passed may be empty (but not null); even if
+        // it is not empty, it may compact down to nothing if all rows are deleted.
+        assert sstables != null && sstableDirectory != null;
     	
     	/*
     	 * pgaref -- Touched
     	 */
-    	//if(CassandraDaemon.ZooServer.getServerState().equalsIgnoreCase("LEADING")){
+    	if(sstables != null){
             //	CassandraDaemon.ZooServer.TrigerRoundRobbinElection();
             //	Thread.sleep(5000);
             	logger.info("AcaZoo - Trying to avoid compaction!!!! ");
             	return;
-      //  }
-        // The collection of sstables passed may be empty (but not null); even if
-        // it is not empty, it may compact down to nothing if all rows are deleted.
-        assert sstables != null && sstableDirectory != null;
+        }
+        
 
         // Note that the current compaction strategy, is not necessarily the one this task was created under.
         // This should be harmless; see comments to CFS.maybeReloadCompactionStrategy.
