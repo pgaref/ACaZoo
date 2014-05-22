@@ -39,7 +39,7 @@ import org.apache.cassandra.utils.CloseableIterator;
 
 public class CompactionTask extends AbstractCompactionTask
 {
-    protected static final java.util.logging.Logger logger = LoggerFactory.getLogger(CompactionTask.class);
+    protected static final Logger logger = LoggerFactory.getLogger(CompactionTask.class);
     protected final int gcBefore;
     protected static long totalBytesCompacted = 0;
     private Set<SSTableReader> toCompact;
@@ -97,7 +97,7 @@ public class CompactionTask extends AbstractCompactionTask
     	if(CassandraDaemon.ZooServer.getServerState().equalsIgnoreCase("LEADING")){
             //	CassandraDaemon.ZooServer.TrigerRoundRobbinElection();
             //	Thread.sleep(5000);
-            	System.out.println("AcaZoo - Trying to avoid compaction!!!! ");
+            	logger.info("AcaZoo - Trying to avoid compaction!!!! ");
             	return;
         }
         // The collection of sstables passed may be empty (but not null); even if
