@@ -93,13 +93,15 @@ public class CompactionTask extends AbstractCompactionTask
     protected void runWith(File sstableDirectory) throws Exception
     {
     	
-    	
-    	if(CassandraDaemon.ZooServer.getServerState().equalsIgnoreCase("LEADING")){
+    	/*
+    	 * pgaref -- Touched
+    	 */
+    	//if(CassandraDaemon.ZooServer.getServerState().equalsIgnoreCase("LEADING")){
             //	CassandraDaemon.ZooServer.TrigerRoundRobbinElection();
             //	Thread.sleep(5000);
             	logger.info("AcaZoo - Trying to avoid compaction!!!! ");
             	return;
-        }
+      //  }
         // The collection of sstables passed may be empty (but not null); even if
         // it is not empty, it may compact down to nothing if all rows are deleted.
         assert sstables != null && sstableDirectory != null;
