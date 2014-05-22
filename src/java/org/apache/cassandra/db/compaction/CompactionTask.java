@@ -39,7 +39,7 @@ import org.apache.cassandra.utils.CloseableIterator;
 
 public class CompactionTask extends AbstractCompactionTask
 {
-    protected static final Logger logger = LoggerFactory.getLogger(CompactionTask.class);
+    protected static final java.util.logging.Logger logger = LoggerFactory.getLogger(CompactionTask.class);
     protected final int gcBefore;
     protected static long totalBytesCompacted = 0;
     private Set<SSTableReader> toCompact;
@@ -118,12 +118,14 @@ public class CompactionTask extends AbstractCompactionTask
         logger.info("Compacting {}", toCompact);
         long CurrTime = (System.currentTimeMillis() -org.apache.cassandra.service.CassandraDaemon.compactionTimer)/1000;
         
-        /* pgaref - Compaction Scheduling  
+        /* pgaref - Compaction Scheduling  */
         System.out.println("\nTRIED TO START COMPACTION!!!!!!!\n");
         if(CassandraDaemon.ZooServer.getServerState().equalsIgnoreCase("LEADING")){
-        	CassandraDaemon.ZooServer.TrigerRoundRobbinElection();
-        	Thread.sleep(5000);
-        }*/
+        //	CassandraDaemon.ZooServer.TrigerRoundRobbinElection();
+        //	Thread.sleep(5000);
+        	logger.info("AcaZoo - Trying to avoid compaction!!!! ");
+        	return;
+        }
         
         
         MyLogWriter("AcaZoo Start time: " +CurrTime +" | "+  toCompact);
