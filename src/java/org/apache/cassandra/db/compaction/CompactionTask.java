@@ -99,12 +99,12 @@ public class CompactionTask extends AbstractCompactionTask
     	/*
     	 * pgaref -- Touched
     	 */
-    	if(sstables != null){
-            //	CassandraDaemon.ZooServer.TrigerRoundRobbinElection();
-            //	Thread.sleep(5000);
-            	logger.info("AcaZoo - Trying to avoid compaction!!!! ");
-            	return;
-        }
+//    	if(sstables != null){
+//            //	CassandraDaemon.ZooServer.TrigerRoundRobbinElection();
+//            //	Thread.sleep(5000);
+//            	logger.info("AcaZoo - Trying to avoid compaction!!!! ");
+//            	return;
+//        }
         
 
         // Note that the current compaction strategy, is not necessarily the one this task was created under.
