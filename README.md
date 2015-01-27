@@ -17,12 +17,14 @@ You can read more about the system [here](http://www.doc.ic.ac.uk/~pg1712/papers
 
 
 ------------IPV4 FIX - if needed---------------------
+
     /etc/gai.conf which is the configuration for getaddrinfo(). 
     There you have to uncomment line ~54 which reads: “precedence ::ffff:0:0/96  100″
 
 
 ---------Java Enviroment Installation--------
-    First download an oracle JDK >=1.7, lets say 17u17
+
+    #First download an oracle JDK >=1.7, lets say 17u17
     tar -xvf jdk-7u17-linux-x64.tar.gz
     sudo mkdir /usr/lib/jvm 
     sudo mv jdk1.7.0_17/ /usr/lib/jvm/
@@ -39,6 +41,7 @@ You can read more about the system [here](http://www.doc.ic.ac.uk/~pg1712/papers
     sudo apt-get install maven2
 
 =====================Startup Scripts=================
+    
     eclipse project ==> ant build 
 
     sudo mkdir /var/lib/cassandra
