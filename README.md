@@ -1,6 +1,6 @@
-#ACaZoo is a Distributed Key-Value Store based on Replicated LSM-Trees 
+#ACaZoo is a distributed key-value Store
 
-It combines the names of the two systems it derives from: Apache
+It's implementation is based on replicated LSM-Trees and it combines the names of the two systems it derives from: Apache
 Cassandra and Apache ZooKeeper
 
 You can read more about the system [here](http://www.doc.ic.ac.uk/~pg1712/papers/srds14.pdf)
