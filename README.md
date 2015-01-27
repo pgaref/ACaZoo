@@ -117,11 +117,11 @@ INSERT INTO users (user_id,  fname, lname)
   
 ++++++++++++++++++++++++++++++Zookeeper Client: 
 
-bin/zkCli.sh -server 127.0.0.1:2181		      
+    bin/zkCli.sh -server 127.0.0.1:2181		      
 
-ls /
+    ls /
 
-create /zk_test my_data
+    create /zk_test my_data
 
 
 ===================== CASSMAIL ===================================
