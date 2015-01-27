@@ -52,7 +52,7 @@ python -c 'print [((2**64 / X) * i) - 2**63 for i in range(X)]'
 
 =====================Enable remote JMX=================
 
-#pgaref was here
+  #pgaref was here
 JVM_OPTS="$JVM_OPTS -Djava.rmi.server.hostname=109.231.124.27"
 
 ++++++++++++++++++++++++++++Cassandra Client: 
