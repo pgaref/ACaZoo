@@ -64,7 +64,8 @@ You can read more about the system [here](http://www.doc.ic.ac.uk/~pg1712/papers
 
     bin/cqlsh
 
-~~~~~~~~~~~~~~~Cassandra CLI commands for YCSB ~~~~~~~~~~~~~~~``
+###Cassandra CLI commands for YCSB
+
     #Disabling autocompaction in a keyspace
     ./bin/nodetool disableautocompaction usertable data
 
@@ -119,13 +120,13 @@ You can read more about the system [here](http://www.doc.ic.ac.uk/~pg1712/papers
   
   
   
- ~How to Load:
-  ./bin/ycsb load cassandra-10 -P workloads/workloada -p hosts=109.231.124.27 -threads 50 -s
- ~How to RUN:
-  ./bin/ycsb run cassandra-10 -P workloads/workloada -p hosts=acazoo1,acazoo2,acazoo3 -threads 256 -s
+    #How to Load data in the database:
+    ./bin/ycsb load cassandra-10 -P workloads/workloada -p hosts=109.231.124.27 -threads 50 -s
+    
+    #How to RUN a workload:
+    ./bin/ycsb run cassandra-10 -P workloads/workloada -p hosts=acazoo1,acazoo2,acazoo3 -threads 256 -s
 
-  
-  ./bin/ycsb run cassandra-10 -P workloads/workloadb -p hosts=acazoo1,acazoo2,acazoo3 -threads 256 -s > WriteSerial1G-cassandra-256
+    ./bin/ycsb run cassandra-10 -P workloads/workloadb -p hosts=acazoo1,acazoo2,acazoo3 -threads 256 -s > WriteSerial1G-cassandra-256
   
 ++++++++++++++++++++++++++++++Zookeeper Client: 
 
