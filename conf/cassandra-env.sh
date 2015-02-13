@@ -235,7 +235,7 @@ JVM_OPTS="$JVM_OPTS -Djava.net.preferIPv4Stack=true"
 # jmx: metrics and administration interface
 # 
 # add this if you're having trouble connecting:
-# JVM_OPTS="$JVM_OPTS -Djava.rmi.server.hostname=<public name>"
+#JVM_OPTS="$JVM_OPTS -Djava.rmi.server.hostname=139.91.70.76"
 # 
 # see 
 # https://blogs.oracle.com/jmxetc/entry/troubleshooting_connection_problems_in_jconsole
