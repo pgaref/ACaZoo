@@ -45,18 +45,20 @@ You can read more about the system [here](http://www.doc.ic.ac.uk/~pg1712/papers
 
 ###### Please note that each node is runnig a DB instance together with a Zookeeper instance. So for each node you have to keep *both* configuration updated. The DB configuration is located under /conf/cassandra.yaml and you have to change at least the IP, seed and listening port. For more information look [here](http://www.datastax.com/documentation/cassandra/2.0/cassandra/configuration/configCassandra_yaml_r.html). The Zookeeper configuration is located under conf/zooConf/zooQuorum.cfg and you have to add the the servers with their correct *IDs* and *IPs*, for more information look [here](http://zookeeper.apache.org/doc/r3.1.2/zookeeperStarted.html).
  
-###### After creating the directories  you can run the script.sh in the root folder to clean the directories and build the project. Please change the echo "1" in the script to the appropriate Zookeeper server ID.
+###### After creating the directories  you can run the *acazooScript.sh* in the root folder to clean the directories and build the project. Please change the echo "1" in the script to the appropriate Zookeeper server ID.
 
-    cassandra.yaml -> In a 3 node cluster one node has to be the seeder. The other two nodes connect to the seeder to retrieve the cluster information. For the first node configure its own IP as seederIP while in the other two configuration files configure the seederIP the first node.
-
-    zooQuorum.cfg -> In a 3 node cluster the seeder node we can set node "1" the seeder(remember to change the script too).
-    Then we have to decide which nodes will be number one and two. When we finish we the zooQuorum.cfg we use the *SAME* file for the other two nodes!
+    *cassandra.yaml* -> In a 3 node cluster one node has to be the seeder. 
+    The other two nodes connect to the seeder to retrieve the cluster information. 
+    For the first node configure its own IP as seederIP while in the other two configuration files configure the seederIP the first node.
+    *zooQuorum.cfg* -> In a 3 node cluster the seeder node we can set node "1" the seeder(remember to change the script too).
+    Then we have to decide which nodes will be number one and two. 
+    When we finish we the zooQuorum.cfg we use the *SAME* file for the other two nodes!
 
 ###### Now we are ready to go! In all cluster nodes run: 
     
     ./bin/cassandra start -f
     
-###### Please run the start command in all the nodes in about the same time or it will fail. The reason is a therhold in the master for waiting for other nodes to connect!
+###### Please run the start command in all the nodes in about the same time or it will fail!
 
 ##To benchmark ACaZoo System using [YCSB](https://github.com/brianfrankcooper/YCSB/)
 
