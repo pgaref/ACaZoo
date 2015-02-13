@@ -5,7 +5,13 @@ Cassandra and Apache ZooKeeper
 
 You can read more about the system [here](http://www.doc.ic.ac.uk/~pg1712/papers/srds14.pdf)
 
-##Some useful Notes 
+##To start ACaZoo System
+
+
+##To benchmark ACaZoo System using (YCSB)[https://github.com/brianfrankcooper/YCSB/]
+
+
+##Some useful Notes (extra)
 
 ---------Cassandra Environment Setup-------------------
 
