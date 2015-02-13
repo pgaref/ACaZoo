@@ -3,4 +3,5 @@
 rm -r /var/zootmp/*
 echo "1" > /var/zootmp/myid
 rm -r /var/lib/cassandra/*
+rm ./AcaZoo-CompactionStats.dat
 ant build
