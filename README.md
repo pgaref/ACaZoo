@@ -7,27 +7,6 @@ You can read more about the system [here](http://www.doc.ic.ac.uk/~pg1712/papers
 
 ##To start ACaZoo System
 
-
-##To benchmark ACaZoo System using [YCSB](https://github.com/brianfrankcooper/YCSB/)
-
-
-##Some useful Notes (extra)
-
----------Cassandra Environment Setup-------------------
-
-    sudo mkdir -p /var/log/cassandra 
-    sudo chown -R `whoami` /var/log/cassandra 
-    sudo mkdir -p /var/lib/cassandra 
-    sudo chown -R `whoami` /var/lib/cassandra 
-
-
-
-------------IPV4 FIX - if needed---------------------
-
-    /etc/gai.conf which is the configuration for getaddrinfo(). 
-    There you have to uncomment line ~54 which reads: “precedence ::ffff:0:0/96  100″
-
-
 ---------Java Enviroment Installation--------
 
     #First download an oracle JDK >=1.7, lets say 17u17
@@ -46,6 +25,13 @@ You can read more about the system [here](http://www.doc.ic.ac.uk/~pg1712/papers
     sudo apt-get install ant-optional
     sudo apt-get install maven2
 
+---------Cassandra Environment Setup-------------------
+
+    sudo mkdir -p /var/log/cassandra 
+    sudo chown -R `whoami` /var/log/cassandra 
+    sudo mkdir -p /var/lib/cassandra 
+    sudo chown -R `whoami` /var/lib/cassandra 
+
 =====================Startup Scripts=================
     
     eclipse project ==> ant build 
@@ -56,6 +42,19 @@ You can read more about the system [here](http://www.doc.ic.ac.uk/~pg1712/papers
     sudo chown pgaref:pgaref /var/log/cassandra/
 
     ./bin/cassandra -f
+
+
+##To benchmark ACaZoo System using [YCSB](https://github.com/brianfrankcooper/YCSB/)
+
+
+##Some useful Notes (extra)
+
+
+------------IPV4 FIX - if needed---------------------
+
+    /etc/gai.conf which is the configuration for getaddrinfo(). 
+    There you have to uncomment line ~54 which reads: “precedence ::ffff:0:0/96  100″
+
 
 =====================Murmur Token generator=================
 
