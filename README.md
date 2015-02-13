@@ -60,7 +60,7 @@ You can read more about the system [here](http://www.doc.ic.ac.uk/~pg1712/papers
     
 ###### Please run the start command in all the nodes in about the same time or it will fail!
 
-##To benchmark ACaZoo System using [YCSB](https://github.com/brianfrankcooper/YCSB/)
+##Benchmark ACaZoo System using [YCSB](https://github.com/brianfrankcooper/YCSB/)
 
 
 ##Some useful Notes (extra)
