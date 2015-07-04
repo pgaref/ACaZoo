@@ -166,7 +166,6 @@ You can read more about the system [here](http://www.doc.ic.ac.uk/~pg1712/papers
     create column family mailboxes with comparator = 'TimeUUIDType';
     create column family users with comparator = 'BytesType';
 
-    
     INSERT INTO Mailboxes (user, email, user_id)
 	values ('jbellis', 'jbellis@datastax.com', 1)
 	IF NOT EXISTS
